@@ -34,6 +34,7 @@ public class ScryfallApiClient
 
         var queryString = $"https://api.scryfall.com/cards/search?order=rarity&q=set%3A{setCode}";
         var response = client.GetAsync(queryString).Result;
+        if (!response.IsSuccessStatusCode) throw new ArgumentException(response.ReasonPhrase);
         var responseJson = JsonDocument.Parse(response.Content.ReadAsStringAsync().Result);
 
         AddCardDataToArray(jsonArray, responseJson.RootElement.GetProperty("data").EnumerateArray());
@@ -42,6 +43,7 @@ public class ScryfallApiClient
         {
             response = client.GetAsync(responseJson.RootElement.GetProperty("next_page").GetString()).Result;
             responseJson = JsonDocument.Parse(response.Content.ReadAsStringAsync().Result);
+            if (!response.IsSuccessStatusCode) throw new ArgumentException(response.ReasonPhrase);
             AddCardDataToArray(jsonArray, responseJson.RootElement.GetProperty("data").EnumerateArray());
         }
         
