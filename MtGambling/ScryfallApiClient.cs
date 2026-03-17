@@ -12,7 +12,7 @@ public class ScryfallApiClient
     public ScryfallApiClient(string dataDirectory)
     {
         _dataDirectory = dataDirectory;
-        var files = Directory.GetFiles(dataDirectory);
+        var files = Directory.GetFiles(dataDirectory).Where(file => Path.GetExtension(file) == ".json");
         foreach (var file in files)
         {
             var setCode = file.Remove(file.LastIndexOf('.'));
