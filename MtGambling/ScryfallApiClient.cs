@@ -6,7 +6,8 @@ namespace MtGambling;
 
 public class ScryfallApiClient
 {
-    private readonly Dictionary<string, JsonArray> _setDataBySetCode = new();
+    private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
+    private readonly Dictionary<string, List<Card>> _setDataBySetCode = new();
     private readonly string _dataDirectory;
     
     public ScryfallApiClient(string dataDirectory)
@@ -16,15 +17,18 @@ public class ScryfallApiClient
         foreach (var file in files)
         {
             var setCode = file.Remove(file.LastIndexOf('.'));
-            _setDataBySetCode.Add(setCode, new JsonArray(File.ReadAllText(file)));
+            var json = File.ReadAllText(file);
+            var setData = JsonSerializer.Deserialize<List<Card>>(File.ReadAllText(file));
+            if (setData is null) throw new ArgumentException($"Failed to read file {file}.");
+            _setDataBySetCode.Add(setCode, setData);
         }
     }
     
-    public JsonArray GetSetData(string setCode)
+    public List<Card> GetSetData(string setCode)
     {
-        if (_setDataBySetCode.TryGetValue(setCode, out var jsonArray)) return jsonArray;
+        if (_setDataBySetCode.TryGetValue(setCode, out var cards)) return cards;
         
-        jsonArray = [];
+        cards = [];
         
         using HttpClient client = new();
         client.DefaultRequestHeaders.Accept.Clear();
@@ -36,28 +40,29 @@ public class ScryfallApiClient
         var response = client.GetAsync(queryString).Result;
         if (!response.IsSuccessStatusCode) throw new ArgumentException(response.ReasonPhrase);
         var responseJson = JsonDocument.Parse(response.Content.ReadAsStringAsync().Result);
-
-        AddCardDataToArray(jsonArray, responseJson.RootElement.GetProperty("data").EnumerateArray());
+        
+        cards.AddRange(
+            responseJson.RootElement.GetProperty("data").EnumerateArray()
+            .Select<JsonElement, Card>(jsonElement => new Card(jsonElement)));
         
         while (responseJson.RootElement.GetProperty("has_more").GetBoolean())
         {
+            Thread.Sleep(500);
             response = client.GetAsync(responseJson.RootElement.GetProperty("next_page").GetString()).Result;
             responseJson = JsonDocument.Parse(response.Content.ReadAsStringAsync().Result);
             if (!response.IsSuccessStatusCode) throw new ArgumentException(response.ReasonPhrase);
-            AddCardDataToArray(jsonArray, responseJson.RootElement.GetProperty("data").EnumerateArray());
+            
+            cards.AddRange(
+                responseJson.RootElement.GetProperty("data").EnumerateArray()
+                    .Select<JsonElement, Card>(jsonElement => new Card(jsonElement)));
         }
         
-        var jsonOptions = new JsonSerializerOptions() { WriteIndented = true };
         File.WriteAllText(
             $"{_dataDirectory}\\{setCode}.json", 
-            jsonArray.ToJsonString(jsonOptions)
+            JsonSerializer.Serialize(cards, _jsonOptions)
             );
         
-        return jsonArray;
-    }
-
-    private static void AddCardDataToArray(JsonArray jsonData, IEnumerable<JsonElement> cards)
-    {
-        foreach (var cardData in cards) jsonData.Add(cardData);
+        _setDataBySetCode.Add(setCode, cards);
+        return cards;
     }
 }
