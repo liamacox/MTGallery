@@ -1,7 +1,11 @@
-﻿using System.Text.Json;
-using MtGambling;
+﻿using MtGambling;
+using MtGambling.Packs;
 
-var client = new ScryfallApiClient(@"C:\Users\Liam Cox\git\MtGambling\SetData");
+const string dataDirectory = @"C:\Users\Liam Cox\git\MtGambling\SetData";
+var client = new ScryfallApiClient(dataDirectory);
+var packGenerator = new PackGenerator(client, dataDirectory);
 
-client.GetSetData("ecl");
-client.GetSetData("blb");
+foreach (var card in packGenerator.GeneratePack("ecl"))
+{
+    Console.WriteLine(card);
+}

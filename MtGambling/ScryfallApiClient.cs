@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace MtGambling;
 
@@ -16,7 +15,7 @@ public class ScryfallApiClient
         var files = Directory.GetFiles(dataDirectory).Where(file => Path.GetExtension(file) == ".json");
         foreach (var file in files)
         {
-            var setCode = file.Remove(file.LastIndexOf('.'));
+            var setCode = file.Remove(file.LastIndexOf('.')).Split('\\').Last();
             var json = File.ReadAllText(file);
             var setData = JsonSerializer.Deserialize<List<Card>>(File.ReadAllText(file));
             if (setData is null) throw new ArgumentException($"Failed to read file {file}.");
