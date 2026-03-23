@@ -16,7 +16,6 @@ public class ScryfallApiClient
         foreach (var file in files)
         {
             var setCode = file.Remove(file.LastIndexOf('.')).Split('\\').Last();
-            var json = File.ReadAllText(file);
             var setData = JsonSerializer.Deserialize<List<Card>>(File.ReadAllText(file));
             if (setData is null) throw new ArgumentException($"Failed to read file {file}.");
             _setDataBySetCode.Add(setCode, setData);
@@ -42,7 +41,7 @@ public class ScryfallApiClient
         
         cards.AddRange(
             responseJson.RootElement.GetProperty("data").EnumerateArray()
-            .Select<JsonElement, Card>(jsonElement => new Card(jsonElement)));
+            .Select<JsonElement, Card>(Card.BuildCardFromJson));
         
         while (responseJson.RootElement.GetProperty("has_more").GetBoolean())
         {
@@ -53,7 +52,7 @@ public class ScryfallApiClient
             
             cards.AddRange(
                 responseJson.RootElement.GetProperty("data").EnumerateArray()
-                    .Select<JsonElement, Card>(jsonElement => new Card(jsonElement)));
+                    .Select<JsonElement, Card>(Card.BuildCardFromJson));
         }
         
         File.WriteAllText(
