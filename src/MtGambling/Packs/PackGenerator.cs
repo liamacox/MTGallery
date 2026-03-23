@@ -36,7 +36,7 @@ public class PackGenerator
 
             var cards = _scryfallApiClient
                 .GetSetData(setCode)
-                .Where(set => set.Rarity == rarity)
+                .Where(card => card.Rarity == rarity)
                 .ToList();
 
             pulledCards.Add(cards.ElementAt(Random.Shared.Next(0, cards.Count)));
