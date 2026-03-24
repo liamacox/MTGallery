@@ -1,0 +1,80 @@
+[
+    {
+        "Common": 1,
+        "Uncommon": 0,
+        "Rare": 0,
+        "Mythic": 0,
+    }, 
+    {
+        "Common": 1,
+        "Uncommon": 0,
+        "Rare": 0,
+        "Mythic": 0,
+    }, 
+    {
+        "Common": 1,
+        "Uncommon": 0,
+        "Rare": 0,
+        "Mythic": 0,
+    }, 
+    {
+        "Common": 1,
+        "Uncommon": 0,
+        "Rare": 0,
+        "Mythic": 0,
+    }, 
+    {
+        "Common": 1,
+        "Uncommon": 0,
+        "Rare": 0,
+        "Mythic": 0,
+    }, 
+    {
+        "Common": 1,
+        "Uncommon": 0,
+        "Rare": 0,
+        "Mythic": 0,
+    }, 
+    {
+        "Common": 1,
+        "Uncommon": 0,
+        "Rare": 0,
+        "Mythic": 0,
+    }, 
+    {
+        "Common": 0,
+        "Uncommon": 1,
+        "Rare": 0,
+        "Mythic": 0,
+    },
+    {
+        "Common": 0,
+        "Uncommon": 1,
+        "Rare": 0,
+        "Mythic": 0,
+    },
+    {
+        "Common": 0,
+        "Uncommon": 1,
+        "Rare": 0,
+        "Mythic": 0,
+    },
+    {
+        "Common": 180,
+        "Uncommon": 600,
+        "Rare": 210,
+        "Mythic": 30,
+    },
+    {
+        "Common": 0,
+        "Uncommon": 0,
+        "Rare": 838,
+        "Mythic": 153,
+    },
+    {
+        "Common": 604,
+        "Uncommon": 308,
+        "Rare": 85,
+        "Mythic": 21,
+    }
+]
