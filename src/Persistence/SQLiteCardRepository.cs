@@ -36,6 +36,8 @@ public class SQLiteCardRepository(string databasePath)
                               """;
         command.Parameters.AddWithValue("@oracle_id", card.OracleId);
         command.Parameters.AddWithValue("@pull_count", card.PullCount);
+        
+        await command.ExecuteNonQueryAsync();
     }
 
     public async Task<List<CardDto>> GetCardsAsync()
