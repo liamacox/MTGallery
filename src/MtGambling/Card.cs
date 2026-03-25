@@ -32,14 +32,14 @@ public record Card(
     {
         if (cardJson.TryGetProperty("image_uris", out var imageUris))
         {
-            return imageUris.GetProperty("normal").GetString()!;
+            return imageUris.GetProperty("small").GetString()!;
         }
 
         return cardJson.GetProperty("card_faces")
             .EnumerateArray()
             .First()
             .GetProperty("image_uris")
-            .GetProperty("normal").GetString()!;
+            .GetProperty("small").GetString()!;
     }
 };
 
