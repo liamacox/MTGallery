@@ -23,12 +23,12 @@ public class PackGenerator
         }
     }
     
-    public List<Card> GeneratePack(string setCode)
+    public Dictionary<Card, int> GeneratePack(string setCode)
     {
         if (!_pullRatesBySet.TryGetValue(setCode, out var pullRates))
             throw new ArgumentException($"Could not find the pull rates for set {setCode}");
 
-        List<Card> pulledCards = [];
+        Dictionary<Card, int> pulledCards = [];
         foreach (var rates in pullRates)
         {
             var draws = GenerateRaritiesList(rates);
@@ -39,7 +39,9 @@ public class PackGenerator
                 .Where(card => card.Rarity == rarity)
                 .ToList();
 
-            pulledCards.Add(cards.ElementAt(Random.Shared.Next(0, cards.Count)));
+            var card = cards.ElementAt(Random.Shared.Next(0, cards.Count));
+            pulledCards.TryGetValue(card, out int count);
+            pulledCards[card] = count + 1;
         }
         
         return pulledCards;
