@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MtGambling", "src\MtGambling\MtGambling.csproj", "{17569E72-E961-4B05-BD89-A0B02A72BA49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MtGambling.UnitTests", "src\MtGambling.UnitTests\MtGambling.UnitTests\MtGambling.UnitTests.csproj", "{4EF6AEF6-A5EB-4DC9-98B2-2C04483CB4F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MtGambling.UnitTests", "src\MtGambling.UnitTests\MtGambling.UnitTests.csproj", "{4EF6AEF6-A5EB-4DC9-98B2-2C04483CB4F1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MtGambling.Persistence", "src\MtGambling.Persistence\MtGambling.Persistence.csproj", "{91E14ACC-761D-4758-A047-9E31DADE4BCA}"
 EndProject
