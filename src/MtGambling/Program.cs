@@ -1,14 +1,18 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Configuration;
 using MtGambling;
+using MtGambling.Configuration;
 using MtGambling.Packs;
 using MtGambling.Persistence;
 
-var configurationBuilder = new ConfigurationBuilder().AddJsonFile(@"C:\Users\Liam Cox\git\MtGambling\appsettings.json");;
-
 const string dataDirectory = @"C:\Users\Liam Cox\git\MtGambling\SetData";
 const string databasePath = @"C:\Users\Liam Cox\git\MtGambling\pulledCards.db";
-const string outputPath = @"C:\Users\Liam Cox\git\MtGambling\output.html";
+
+var configurationBuilder = new ConfigurationBuilder().AddJsonFile(@"C:\Users\Liam Cox\git\MtGambling\appsettings.json");;
+var configuration =  configurationBuilder.Build();
+
+var outputOptions = new OutputOptions();
+configuration.GetSection(nameof(OutputOptions)).Bind(outputOptions);
 
 var client = new ScryfallApiClient(dataDirectory);
 var packGenerator = new PackGenerator(client, dataDirectory);
@@ -54,4 +58,4 @@ stringBuilder.AppendLine("</table>");
 stringBuilder.AppendLine("</body>");
 stringBuilder.AppendLine("</html>");
 
-File.WriteAllText(outputPath, stringBuilder.ToString());
+File.WriteAllText(outputOptions.OutputPath, stringBuilder.ToString());
