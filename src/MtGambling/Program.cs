@@ -1,7 +1,10 @@
 ﻿using System.Text;
+using Microsoft.Extensions.Configuration;
 using MtGambling;
 using MtGambling.Packs;
-using Persistence;
+using MtGambling.Persistence;
+
+var configurationBuilder = new ConfigurationBuilder().AddJsonFile(@"C:\Users\Liam Cox\git\MtGambling\appsettings.json");;
 
 const string dataDirectory = @"C:\Users\Liam Cox\git\MtGambling\SetData";
 const string databasePath = @"C:\Users\Liam Cox\git\MtGambling\pulledCards.db";
