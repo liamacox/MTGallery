@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Data.Sqlite;
 
-namespace Persistence;
+namespace MtGambling.Persistence;
 
 public class SQLiteCardRepository(string databasePath)
 {

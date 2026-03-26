@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using MtGambling;
 
-namespace TestProject1;
+namespace MtGambling.UnitTests;
 
 public class card_constructor
 {
