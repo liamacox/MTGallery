@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace MtGambling.Packs;
+namespace MTGallery.Packs;
 
 public class PackGenerator
 {

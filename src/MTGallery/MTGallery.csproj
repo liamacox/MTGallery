@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MtGambling.Configuration\MtGambling.Configuration.csproj" />
-      <ProjectReference Include="..\MtGambling.Persistence\MtGambling.Persistence.csproj" />
+      <ProjectReference Include="..\MTGallery.Configuration\MTGallery.Configuration.csproj" />
+      <ProjectReference Include="..\MTGallery.Persistence\MTGallery.Persistence.csproj" />
     </ItemGroup>
 
     <ItemGroup>

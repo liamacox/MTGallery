@@ -1,4 +1,4 @@
-﻿namespace MtGambling.Configuration;
+﻿namespace MTGallery.Configuration;
 
 public sealed class OutputOptions
 {

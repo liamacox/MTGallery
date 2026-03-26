@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace MtGambling;
+namespace MTGallery;
 
 public class ScryfallApiClient
 {
@@ -32,7 +32,7 @@ public class ScryfallApiClient
         client.DefaultRequestHeaders.Accept.Clear();
         client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
-        client.DefaultRequestHeaders.Add("User-Agent", "MtGambling/1.0");
+        client.DefaultRequestHeaders.Add("User-Agent", "MTGallery/1.0");
 
         var queryString = $"https://api.scryfall.com/cards/search?order=rarity&q=set%3A{setCode}";
         var response = client.GetAsync(queryString).Result;
