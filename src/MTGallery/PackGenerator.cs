@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
+using MTGallery.Domain;
 
-namespace MTGallery.Packs;
+namespace MTGallery;
 
 public class PackGenerator
 {

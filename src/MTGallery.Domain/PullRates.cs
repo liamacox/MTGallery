@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace MTGallery.Packs;
+namespace MTGallery.Domain;
 
 [method: JsonConstructor]
 public record Rates(

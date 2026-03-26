@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using MTGallery;
 using MTGallery.Configuration;
-using MTGallery.Packs;
 using MTGallery.Persistence;
 
 const string dataDirectory = @"C:\Users\Liam Cox\git\MTGallery\SetData";

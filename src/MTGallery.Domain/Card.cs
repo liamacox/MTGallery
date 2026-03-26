@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace MTGallery;
+namespace MTGallery.Domain;
 
 [method: JsonConstructor]
 public record Card(
