@@ -12,6 +12,12 @@ var configuration =  configurationBuilder.Build();
 
 var outputOptions = new OutputOptions();
 configuration.GetSection(nameof(OutputOptions)).Bind(outputOptions);
+var databaseOptions = new DatabaseConfigurationOptions();
+configuration.GetSection(nameof(DatabaseConfigurationOptions)).Bind(databaseOptions);
+
+var postgreSqlRepository = new PostgreSqlRepository(databaseOptions);
+await postgreSqlRepository.InitializeAsync();
+return;
 
 var client = new ScryfallApiClient(dataDirectory);
 var packGenerator = new PackGenerator(client, dataDirectory);
