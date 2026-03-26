@@ -1,14 +1,14 @@
 ﻿using System.Text;
 using Microsoft.Extensions.Configuration;
-using MtGambling;
-using MtGambling.Configuration;
-using MtGambling.Packs;
-using MtGambling.Persistence;
+using MTGallery;
+using MTGallery.Configuration;
+using MTGallery.Packs;
+using MTGallery.Persistence;
 
-const string dataDirectory = @"C:\Users\Liam Cox\git\MtGambling\SetData";
-const string databasePath = @"C:\Users\Liam Cox\git\MtGambling\pulledCards.db";
+const string dataDirectory = @"C:\Users\Liam Cox\git\MTGallery\SetData";
+const string databasePath = @"C:\Users\Liam Cox\git\MTGallery\pulledCards.db";
 
-var configurationBuilder = new ConfigurationBuilder().AddJsonFile(@"C:\Users\Liam Cox\git\MtGambling\appsettings.json");;
+var configurationBuilder = new ConfigurationBuilder().AddJsonFile(@"C:\Users\Liam Cox\git\MTGallery\appsettings.json");;
 var configuration =  configurationBuilder.Build();
 
 var outputOptions = new OutputOptions();

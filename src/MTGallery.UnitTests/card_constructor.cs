@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using MtGambling;
+using MTGallery;
 
-namespace MtGambling.UnitTests;
+namespace MTGallery.UnitTests;
 
 public class card_constructor
 {

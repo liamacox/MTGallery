@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace MtGambling.Packs;
+namespace MTGallery.Packs;
 
 [method: JsonConstructor]
 public record Rates(
