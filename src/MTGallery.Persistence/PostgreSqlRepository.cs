@@ -62,7 +62,7 @@ public class PostgreSqlRepository(
 
         await using var command = dataSource.CreateCommand();
         command.CommandText = """
-                              CREATE TABLE IF NOT EXISTS set_data (
+                              CREATE TABLE IF NOT EXISTS pulled_cards (
                               scryfall_id TEXT PRIMARY KEY,
                               oracle_id TEXT,
                               set TEXT NOT NULL,
