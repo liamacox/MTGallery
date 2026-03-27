@@ -21,7 +21,7 @@ var postgreSqlRepository = new PostgreSqlRepository(databaseOptions, configuredS
 await postgreSqlRepository.InitializeAsync();
 return;
 
-var client = new ScryfallApiClient(dataDirectory);
+/*var client = new ScryfallApiClient(dataDirectory);
 var packGenerator = new PackGenerator(client, dataDirectory);
 
 var repository = new SQLiteCardRepository(databasePath);
@@ -65,4 +65,4 @@ stringBuilder.AppendLine("</table>");
 stringBuilder.AppendLine("</body>");
 stringBuilder.AppendLine("</html>");
 
-File.WriteAllText(outputOptions.OutputPath, stringBuilder.ToString());
+File.WriteAllText(outputOptions.OutputPath, stringBuilder.ToString());*/
