@@ -7,6 +7,8 @@ namespace MTGallery.Domain;
 public record Card(
     string Name,
     Rarity Rarity,
+    string ScryfallId,
+    string Set,
     string OracleId,
     string ScryfallUri,
     string ImageUri)
@@ -20,7 +22,9 @@ public record Card(
             var oracleId = cardJson.GetProperty("oracle_id").GetString()!;
             var scryfallUri = cardJson.GetProperty("scryfall_uri").GetString()!;
             var imageUri = GetImageUri(cardJson);
-            return new Card(name, rarity, oracleId, scryfallUri, imageUri);
+            var set = cardJson.GetProperty("set").GetString()!;
+            var scryfallId = cardJson.GetProperty("id").GetString()!;
+            return new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri);
         }
         catch (Exception)
         {

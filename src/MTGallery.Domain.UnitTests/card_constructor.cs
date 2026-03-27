@@ -163,6 +163,8 @@ public class card_constructor
       Assert.Equal(Rarity.Mythic, card.Rarity);
       Assert.Equal("https://scryfall.com/card/ecl/4/ajani-outland-chaperone?utm_source=api", card.ScryfallUri);
       Assert.Equal("https://cards.scryfall.io/small/front/6/1/6124a691-ae83-4d22-a177-0aee65b47064.jpg?1767951721", card.ImageUri);
+      Assert.Equal("6124a691-ae83-4d22-a177-0aee65b47064", card.ScryfallId);
+      Assert.Equal("ecl", card.Set);
     }
     
     [Fact]
@@ -349,5 +351,7 @@ public class card_constructor
       Assert.Equal(Rarity.Mythic, card.Rarity);
       Assert.Equal("https://scryfall.com/card/ecl/13/eirdu-carrier-of-dawn-isilu-carrier-of-twilight?utm_source=api", card.ScryfallUri);
       Assert.Equal("https://cards.scryfall.io/small/front/b/2/b2d9d5ca-7e15-437a-bdfc-5972b42148fe.jpg?1759144812", card.ImageUri);
+      Assert.Equal("b2d9d5ca-7e15-437a-bdfc-5972b42148fe", card.ScryfallId);
+      Assert.Equal("ecl", card.Set);
     }
 }

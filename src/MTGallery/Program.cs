@@ -14,8 +14,10 @@ var outputOptions = new OutputOptions();
 configuration.GetSection(nameof(OutputOptions)).Bind(outputOptions);
 var databaseOptions = new DatabaseConfigurationOptions();
 configuration.GetSection(nameof(DatabaseConfigurationOptions)).Bind(databaseOptions);
+var configuredSetsOptions = new ConfiguredSetsOptions();
+configuration.GetSection(nameof(ConfiguredSetsOptions)).Bind(configuredSetsOptions);
 
-var postgreSqlRepository = new PostgreSqlRepository(databaseOptions);
+var postgreSqlRepository = new PostgreSqlRepository(databaseOptions, configuredSetsOptions);
 await postgreSqlRepository.InitializeAsync();
 return;
 
