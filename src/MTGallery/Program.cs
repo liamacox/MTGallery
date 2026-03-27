@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using MTGallery;
 using MTGallery.Configuration;
 using MTGallery.Persistence;
-using Microsoft.Extensions.Caching.Memory;
 
 /* ---------------------------------------- CONFIGURATION ---------------------------------------- */
 
