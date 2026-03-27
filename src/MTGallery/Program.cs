@@ -19,52 +19,40 @@ await postgreSqlRepository.InitializeAsync();
 
 var packGenerator = new PackGenerator(postgreSqlRepository, configuredSetsOptions);
 
-foreach (var (card, count) in await packGenerator.GeneratePack("ecl"))
+var pulledCards = await packGenerator.GeneratePack("blb");
+await postgreSqlRepository.UpsertPulledCardsAsync(pulledCards);
+File.WriteAllText(outputOptions.OutputPath, string.Empty);
+File.AppendAllText(outputOptions.OutputPath, """
+                                            <!DOCTYPE html>
+                                            <html>
+                                            <head>
+                                            <title>Cards</title>
+                                            </head>
+                                            <body>
+                                            <table>
+                                            <tr>
+                                            <th>Card</th>
+                                            <th>Name</th>
+                                            <th>Rarity</th>
+                                            <th>Count</th>
+                                            </tr>
+
+                                            """);
+
+foreach (var (card, count) in await postgreSqlRepository.GetPulledCardsAsync())
 {
-    Console.WriteLine(card.Name);
-}
-/*var client = new ScryfallApiClient(dataDirectory);
-var packGenerator = new PackGenerator(client, dataDirectory);
-
-var repository = new SQLiteCardRepository(databasePath);
-await repository.InitializeAsync();
-
-foreach (var (card, count) in packGenerator.GeneratePack("ecl"))
-{
-    await repository.UpsertCardAsync(new CardDto(card.OracleId, count));
-}
-
-var stringBuilder = new StringBuilder("""
-                                      <!DOCTYPE html>
-                                      <html>
-                                      <head>
-                                      <title>Cards</title>
-                                      </head>
-                                      <body>
-                                      <table>
-                                      <tr>
-                                      <th>Card</th>
-                                      <th>Name</th>
-                                      <th>Rarity</th>
-                                      <th>Count</th>
-                                      </tr>
-
-                                      """);
-
-foreach (var cardDto in repository.GetCardsAsync().Result)
-{
-    var card = client.GetSetData("ecl").Single(card => card.OracleId == cardDto.OracleId);
-    
-    stringBuilder.AppendLine("<tr>");
-    stringBuilder.AppendLine($"<th><img src=\"{card.ImageUri}\" alt=\"{card.Name}\"></th>");
-    stringBuilder.AppendLine($"<th><a href=\"{card.ScryfallUri}\">{card.Name}</a></th>");
-    stringBuilder.AppendLine($"<th>{card.Rarity.ToString()}</th>");
-    stringBuilder.AppendLine($"<th>{cardDto.PullCount}</th>");
-    stringBuilder.AppendLine("</tr>");
+    File.AppendAllText(outputOptions.OutputPath,$"""
+                                                 <tr>
+                                                 <th><img src="{card.ImageUri}" alt="{card.Name}"></th>
+                                                 <th><a href="{card.ScryfallUri}">{card.Name}</a></th>
+                                                 <th>{card.Rarity.ToString()}</th>
+                                                 <th>{count}</th>
+                                                 </tr>
+                                                 """);
 }
 
-stringBuilder.AppendLine("</table>");
-stringBuilder.AppendLine("</body>");
-stringBuilder.AppendLine("</html>");
-
-File.WriteAllText(outputOptions.OutputPath, stringBuilder.ToString());*/
+File.AppendAllText(outputOptions.OutputPath, """
+                                             </table>
+                                             </body>
+                                             </html>
+                                             """);

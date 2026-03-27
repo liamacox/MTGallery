@@ -65,7 +65,7 @@ public class PostgreSqlRepository(
                                       """;
                 command.Parameters.AddWithValue("@scryfall_id", card.ScryfallId);
                 command.Parameters.AddWithValue("@oracle_id", card.OracleId);
-                command.Parameters.AddWithValue("@set", setCode);
+                command.Parameters.AddWithValue("@set", card.Set);
                 command.Parameters.AddWithValue("@name", card.Name);
                 command.Parameters.AddWithValue("@rarity", card.Rarity.ToString());
                 command.Parameters.AddWithValue("@scryfall_uri", card.ScryfallUri);
@@ -92,7 +92,7 @@ public class PostgreSqlRepository(
                               rarity TEXT NOT NULL,
                               scryfall_uri TEXT NOT NULL,
                               image_uri TEXT NOT NULL,
-                              count INTEGER DEFAULT 1 NOT NULL
+                              pull_count INTEGER DEFAULT 1 NOT NULL
                               );
                               """;
         await command.ExecuteNonQueryAsync();
@@ -160,6 +160,65 @@ public class PostgreSqlRepository(
             var scryfallUri = reader.GetString(5);
             var imageUri = reader.GetString(6);
             cards.Add(new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri));
+        }
+
+        return cards;
+    }
+
+    public async Task UpsertPulledCardsAsync(Dictionary<Card, int> pulledCards)
+    {
+        await using var connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        await using var batch = new NpgsqlBatch(connection);
+        
+        foreach (var (card, count) in pulledCards) 
+        {
+
+            var command = new NpgsqlBatchCommand();
+            command.CommandText = """
+                                  INSERT INTO pulled_cards (scryfall_id, oracle_id, "set", name, rarity, scryfall_uri, image_uri, pull_count)
+                                  VALUES (@scryfall_id, @oracle_id, @set, @name, @rarity, @scryfall_uri, @image_uri, @pull_count)
+                                  ON CONFLICT (scryfall_id)
+                                  DO UPDATE SET pull_count = pulled_cards.pull_count + EXCLUDED.pull_count;
+                                  """;
+            command.Parameters.AddWithValue("@scryfall_id", card.ScryfallId);
+            command.Parameters.AddWithValue("@oracle_id", card.OracleId);
+            command.Parameters.AddWithValue("@set", card.Set);
+            command.Parameters.AddWithValue("@name", card.Name);
+            command.Parameters.AddWithValue("@rarity", card.Rarity.ToString());
+            command.Parameters.AddWithValue("@scryfall_uri", card.ScryfallUri);
+            command.Parameters.AddWithValue("@image_uri", card.ImageUri);
+            command.Parameters.AddWithValue("@pull_count", count);
+
+            batch.BatchCommands.Add(command);
+        }
+        await batch.ExecuteNonQueryAsync();
+    }
+
+    public async Task<List<(Card card, int count)>> GetPulledCardsAsync()
+    {
+        await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+        
+        await using var command = dataSource.CreateCommand();
+        command.CommandText = """
+                              SELECT * FROM pulled_cards;
+                              """;
+
+        await using var reader = await command.ExecuteReaderAsync();
+
+        List<(Card card, int count)> cards = [];
+        while (await reader.ReadAsync())
+        {
+            var scryfallId = reader.GetString(0);
+            var oracleId = reader.GetString(1);
+            var set = reader.GetString(2);
+            var name =  reader.GetString(3);
+            var rarity = Enum.Parse<Rarity>(reader.GetString(4), ignoreCase: true);
+            var scryfallUri = reader.GetString(5);
+            var imageUri = reader.GetString(6);
+            var count = reader.GetInt32(7);
+            cards.Add((new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri), count));
         }
 
         return cards;
