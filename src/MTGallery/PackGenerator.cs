@@ -7,7 +7,7 @@ public class PackGenerator
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions = new() {AllowTrailingCommas = true};
     private readonly ScryfallApiClient _scryfallApiClient;
-    private readonly Dictionary<string, List<Rates>> _pullRatesBySet;
+    private readonly Dictionary<string, List<PullRates>> _pullRatesBySet;
 
     public PackGenerator(ScryfallApiClient scryfallApiClient, string dataDirectory)
     {
@@ -18,7 +18,7 @@ public class PackGenerator
         foreach (var file in files)
         {
             var setCode = file.Remove(file.LastIndexOf('.')).Split('\\').Last();
-            var pullRates = JsonSerializer.Deserialize<List<Rates>>(File.ReadAllText(file), _jsonSerializerOptions);
+            var pullRates = JsonSerializer.Deserialize<List<PullRates>>(File.ReadAllText(file), _jsonSerializerOptions);
             if (pullRates is null) throw new JsonException($"Could not load pull rates for file {file}");
             _pullRatesBySet.Add(setCode, pullRates);
         }
@@ -48,14 +48,14 @@ public class PackGenerator
         return pulledCards;
     }
 
-    private static List<Rarity> GenerateRaritiesList(Rates rates)
+    private static List<Rarity> GenerateRaritiesList(PullRates pullRates)
     {
         Rarity[] rarities = 
         [
-            .. Enumerable.Repeat(Rarity.Common, rates.Common),
-            .. Enumerable.Repeat(Rarity.Uncommon, rates.Uncommon),
-            .. Enumerable.Repeat(Rarity.Rare, rates.Rare),
-            .. Enumerable.Repeat(Rarity.Mythic, rates.Mythic)
+            .. Enumerable.Repeat(Rarity.Common, pullRates.Common),
+            .. Enumerable.Repeat(Rarity.Uncommon, pullRates.Uncommon),
+            .. Enumerable.Repeat(Rarity.Rare, pullRates.Rare),
+            .. Enumerable.Repeat(Rarity.Mythic, pullRates.Mythic)
         ];
         
         Random.Shared.Shuffle(rarities.ToArray());

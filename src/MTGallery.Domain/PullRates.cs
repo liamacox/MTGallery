@@ -3,7 +3,7 @@
 namespace MTGallery.Domain;
 
 [method: JsonConstructor]
-public record Rates(
+public record PullRates(
     int Common,
     int Uncommon,
     int Rare,

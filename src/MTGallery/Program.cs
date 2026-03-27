@@ -19,7 +19,6 @@ configuration.GetSection(nameof(ConfiguredSetsOptions)).Bind(configuredSetsOptio
 
 var postgreSqlRepository = new PostgreSqlRepository(databaseOptions, configuredSetsOptions);
 await postgreSqlRepository.InitializeAsync();
-return;
 
 /*var client = new ScryfallApiClient(dataDirectory);
 var packGenerator = new PackGenerator(client, dataDirectory);
