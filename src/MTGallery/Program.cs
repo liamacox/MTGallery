@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using MTGallery;
 using MTGallery.Configuration;
 using MTGallery.Persistence;
 
-var configurationBuilder = new ConfigurationBuilder().AddJsonFile(@"C:\Users\Liam Cox\git\MTGallery\appsettings.json");;
+/* ---------------------------------------- CONFIGURATION ---------------------------------------- */
+
+var configurationBuilder = new ConfigurationBuilder().AddJsonFile(@"C:\Users\Liam Cox\git\MTGallery\appsettings.json", optional: false);
 var configuration =  configurationBuilder.Build();
 
 var outputOptions = new OutputOptions();
@@ -13,11 +16,15 @@ configuration.GetSection(nameof(DatabaseConfigurationOptions)).Bind(databaseOpti
 var configuredSetsOptions = new ConfiguredSetsOptions();
 configuration.GetSection(nameof(ConfiguredSetsOptions)).Bind(configuredSetsOptions);
 
-var client = new ScryfallApiClient();
-var postgreSqlRepository = new PostgreSqlRepository(client, databaseOptions, configuredSetsOptions);
-await postgreSqlRepository.InitializeAsync();
+/* ---------------------------------------- DI ---------------------------------------- */
 
+var cache =  new MemoryCache(new MemoryCacheOptions());
+var client = new ScryfallApiClient();
+var postgreSqlRepository = new PostgreSqlRepository(client, cache, databaseOptions, configuredSetsOptions);
+await postgreSqlRepository.InitializeAsync();
 var packGenerator = new PackGenerator(postgreSqlRepository, configuredSetsOptions);
+
+/* ---------------------------------------- Execution ---------------------------------------- */
 
 var pulledCards = await packGenerator.GeneratePack("blb");
 await postgreSqlRepository.UpsertPulledCardsAsync(pulledCards);

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 using MTGallery.Configuration;
 using MTGallery.Domain;
 using Npgsql;
@@ -7,6 +8,7 @@ namespace MTGallery.Persistence;
 
 public class PostgreSqlRepository(
     ScryfallApiClient scryfallApiClient,
+    MemoryCache cache,
     DatabaseConfigurationOptions databaseOptions, 
     ConfiguredSetsOptions configuredSetsOptions)
 {
@@ -116,28 +118,44 @@ public class PostgreSqlRepository(
     {
         if (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
             throw new ArgumentException($"{setCode} is not a configured set!");
+
+        var (success, pullRatesJson) = GetPullRatesFromCache(setCode);
+        if (!success)
+        {
+            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+
+            await using var command = dataSource.CreateCommand();
+            command.CommandText = """
+                                  SELECT pull_rates FROM pull_rates WHERE set = @set LIMIT 1;
+                                  """;
+            command.Parameters.AddWithValue("@set", setCode);
+
+            pullRatesJson = (await command.ExecuteScalarAsync())?.ToString();
+            cache.Set($"{setCode}-pull-rates", pullRatesJson);
+        }
         
-        await using var dataSource = NpgsqlDataSource.Create(_connectionString);
-
-        await using var command = dataSource.CreateCommand();
-        command.CommandText = """
-                              SELECT pull_rates FROM pull_rates WHERE set = @set LIMIT 1;
-                              """;
-        command.Parameters.AddWithValue("@set", setCode);
-
-        var pullRatesJson = (await command.ExecuteScalarAsync())?.ToString();
         if (pullRatesJson is null) throw new ArgumentException($"{setCode} data could not be found!");
-        
         var pullRates = JsonSerializer.Deserialize<List<PullRates>>(pullRatesJson);
-        if (pullRates is null) throw new JsonException($"Could not deserialize pull rates for set {setCode}");
+        
+        return pullRates ?? throw new JsonException($"Could not deserialize pull rates for set {setCode}");
+    }
 
-        return pullRates;
+    private (bool success, string? pullRatesJson) GetPullRatesFromCache(string setCode)
+    {
+        if (!cache.TryGetValue($"{setCode}-pull-rates", out string? pullRatesJson)) 
+            return (false, null);
+        return pullRatesJson is null
+            ? (false, null)
+            : (true, pullRatesJson);
     }
 
     public async Task<HashSet<Card>> GetCardsForSetAsync(string setCode)
     {
         if (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
             throw new ArgumentException($"{setCode} is not a configured set!");
+
+        var (success, setData) = GetSetDataFromCache(setCode);
+        if (success) return setData;
         
         await using var dataSource = NpgsqlDataSource.Create(_connectionString);
         
@@ -148,8 +166,7 @@ public class PostgreSqlRepository(
         command.Parameters.AddWithValue("@set", setCode);
 
         await using var reader = await command.ExecuteReaderAsync();
-
-        HashSet<Card> cards = [];
+        
         while (await reader.ReadAsync())
         {
             var scryfallId = reader.GetString(0);
@@ -159,10 +176,20 @@ public class PostgreSqlRepository(
             var rarity = Enum.Parse<Rarity>(reader.GetString(4), ignoreCase: true);
             var scryfallUri = reader.GetString(5);
             var imageUri = reader.GetString(6);
-            cards.Add(new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri));
+            setData.Add(new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri));
         }
 
-        return cards;
+        cache.Set($"{setCode}-set-data", setData);
+        return setData;
+    }
+    
+    private (bool success, HashSet<Card> setData) GetSetDataFromCache(string setCode)
+    {
+        if (!cache.TryGetValue($"{setCode}-set-data", out HashSet<Card>? setData)) 
+            return (false,[]);
+        return setData is null
+            ? (false, [])
+            : (true, setData);
     }
 
     public async Task UpsertPulledCardsAsync(Dictionary<Card, int> pulledCards)
