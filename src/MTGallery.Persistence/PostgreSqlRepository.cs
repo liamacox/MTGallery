@@ -6,6 +6,7 @@ using Npgsql;
 namespace MTGallery.Persistence;
 
 public class PostgreSqlRepository(
+    ScryfallApiClient scryfallApiClient,
     DatabaseConfigurationOptions databaseOptions, 
     ConfiguredSetsOptions configuredSetsOptions)
 {
@@ -36,8 +37,47 @@ public class PostgreSqlRepository(
                               CREATE INDEX IF NOT EXISTS idx_set ON set_data(set);
                               """;
         await command.ExecuteNonQueryAsync();
+        
+        if (configuredSetsOptions.HydrateSetData) await HydrateSetData();
     }
-    
+
+    private async Task HydrateSetData()
+    {
+        await using var connection = new NpgsqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        await using var truncateCommand = connection.CreateCommand();
+        truncateCommand.CommandText = """
+                                      TRUNCATE TABLE set_data RESTART IDENTITY;
+                                      """;
+        await truncateCommand.ExecuteNonQueryAsync();
+
+        foreach (var setCode in configuredSetsOptions.ConfiguredSets)
+        {
+            var cards = scryfallApiClient.GetSetData(setCode);
+            
+            await using var batch = new NpgsqlBatch(connection);
+            foreach (var card in cards)
+            {
+                var command = new NpgsqlBatchCommand();
+                command.CommandText = """
+                                      INSERT INTO set_data VALUES (@scryfall_id, @oracle_id, @set, @name, @rarity, @scrfall_uri, @image_uri);
+                                      """;
+                command.Parameters.AddWithValue("@scryfall_id", card.ScryfallId);
+                command.Parameters.AddWithValue("@oracle_id", card.OracleId);
+                command.Parameters.AddWithValue("@set", setCode);
+                command.Parameters.AddWithValue("@name", card.Name);
+                command.Parameters.AddWithValue("@rarity", card.Rarity.ToString());
+                command.Parameters.AddWithValue("@scrfall_uri", card.ScryfallUri);
+                command.Parameters.AddWithValue("@image_uri", card.ImageUri);
+                
+                batch.BatchCommands.Add(command);
+            }
+
+            await batch.ExecuteNonQueryAsync();
+        }
+    }
+
     private async Task CreatePulledCardsTable()
     {
         await using var dataSource = NpgsqlDataSource.Create(_connectionString);

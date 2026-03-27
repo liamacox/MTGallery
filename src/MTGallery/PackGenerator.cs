@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using MTGallery.Domain;
+using MTGallery.Persistence;
 
 namespace MTGallery;
 

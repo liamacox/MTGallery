@@ -1,11 +1,6 @@
-﻿using System.Text;
-using Microsoft.Extensions.Configuration;
-using MTGallery;
+﻿using Microsoft.Extensions.Configuration;
 using MTGallery.Configuration;
 using MTGallery.Persistence;
-
-const string dataDirectory = @"C:\Users\Liam Cox\git\MTGallery\SetData";
-const string databasePath = @"C:\Users\Liam Cox\git\MTGallery\pulledCards.db";
 
 var configurationBuilder = new ConfigurationBuilder().AddJsonFile(@"C:\Users\Liam Cox\git\MTGallery\appsettings.json");;
 var configuration =  configurationBuilder.Build();
@@ -17,7 +12,8 @@ configuration.GetSection(nameof(DatabaseConfigurationOptions)).Bind(databaseOpti
 var configuredSetsOptions = new ConfiguredSetsOptions();
 configuration.GetSection(nameof(ConfiguredSetsOptions)).Bind(configuredSetsOptions);
 
-var postgreSqlRepository = new PostgreSqlRepository(databaseOptions, configuredSetsOptions);
+var client = new ScryfallApiClient();
+var postgreSqlRepository = new PostgreSqlRepository(client, databaseOptions, configuredSetsOptions);
 await postgreSqlRepository.InitializeAsync();
 
 /*var client = new ScryfallApiClient(dataDirectory);
