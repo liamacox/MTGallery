@@ -61,14 +61,14 @@ public class PostgreSqlRepository(
             {
                 var command = new NpgsqlBatchCommand();
                 command.CommandText = """
-                                      INSERT INTO set_data VALUES (@scryfall_id, @oracle_id, @set, @name, @rarity, @scrfall_uri, @image_uri);
+                                      INSERT INTO set_data VALUES (@scryfall_id, @oracle_id, @set, @name, @rarity, @scryfall_uri, @image_uri);
                                       """;
                 command.Parameters.AddWithValue("@scryfall_id", card.ScryfallId);
                 command.Parameters.AddWithValue("@oracle_id", card.OracleId);
                 command.Parameters.AddWithValue("@set", setCode);
                 command.Parameters.AddWithValue("@name", card.Name);
                 command.Parameters.AddWithValue("@rarity", card.Rarity.ToString());
-                command.Parameters.AddWithValue("@scrfall_uri", card.ScryfallUri);
+                command.Parameters.AddWithValue("@scryfall_uri", card.ScryfallUri);
                 command.Parameters.AddWithValue("@image_uri", card.ImageUri);
                 
                 batch.BatchCommands.Add(command);
@@ -132,5 +132,36 @@ public class PostgreSqlRepository(
         if (pullRates is null) throw new JsonException($"Could not deserialize pull rates for set {setCode}");
 
         return pullRates;
-    } 
+    }
+
+    public async Task<HashSet<Card>> GetCardsForSetAsync(string setCode)
+    {
+        if (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
+            throw new ArgumentException($"{setCode} is not a configured set!");
+        
+        await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+        
+        await using var command = dataSource.CreateCommand();
+        command.CommandText = """
+                              SELECT * FROM set_data WHERE set = @set;
+                              """;
+        command.Parameters.AddWithValue("@set", setCode);
+
+        await using var reader = await command.ExecuteReaderAsync();
+
+        HashSet<Card> cards = [];
+        while (await reader.ReadAsync())
+        {
+            var scryfallId = reader.GetString(0);
+            var oracleId = reader.GetString(1);
+            var set = reader.GetString(2);
+            var name =  reader.GetString(3);
+            var rarity = Enum.Parse<Rarity>(reader.GetString(4), ignoreCase: true);
+            var scryfallUri = reader.GetString(5);
+            var imageUri = reader.GetString(6);
+            cards.Add(new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri));
+        }
+
+        return cards;
+    }
 }

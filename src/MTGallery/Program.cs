@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using MTGallery;
 using MTGallery.Configuration;
 using MTGallery.Persistence;
 
@@ -16,6 +17,12 @@ var client = new ScryfallApiClient();
 var postgreSqlRepository = new PostgreSqlRepository(client, databaseOptions, configuredSetsOptions);
 await postgreSqlRepository.InitializeAsync();
 
+var packGenerator = new PackGenerator(postgreSqlRepository, configuredSetsOptions);
+
+foreach (var (card, count) in await packGenerator.GeneratePack("ecl"))
+{
+    Console.WriteLine(card.Name);
+}
 /*var client = new ScryfallApiClient(dataDirectory);
 var packGenerator = new PackGenerator(client, dataDirectory);
 
