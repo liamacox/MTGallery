@@ -2,11 +2,13 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTGallery", "src\MTGallery\MTGallery.csproj", "{17569E72-E961-4B05-BD89-A0B02A72BA49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTGallery.UnitTests", "src\MTGallery.UnitTests\MTGallery.UnitTests.csproj", "{4EF6AEF6-A5EB-4DC9-98B2-2C04483CB4F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTGallery.Domain.UnitTests", "src\MTGallery.Domain.UnitTests\MTGallery.Domain.UnitTests.csproj", "{4EF6AEF6-A5EB-4DC9-98B2-2C04483CB4F1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTGallery.Persistence", "src\MTGallery.Persistence\MTGallery.Persistence.csproj", "{91E14ACC-761D-4758-A047-9E31DADE4BCA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTGallery.Configuration", "src\MTGallery.Configuration\MTGallery.Configuration.csproj", "{AEEB53DB-0D42-4A89-8EDB-93F3E71C87AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTGallery.Domain", "src\MTGallery.Domain\MTGallery.Domain.csproj", "{CF350153-0C11-41EF-B6BC-603A2480ECE5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +32,9 @@ Global
 		{AEEB53DB-0D42-4A89-8EDB-93F3E71C87AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEEB53DB-0D42-4A89-8EDB-93F3E71C87AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEEB53DB-0D42-4A89-8EDB-93F3E71C87AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF350153-0C11-41EF-B6BC-603A2480ECE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF350153-0C11-41EF-B6BC-603A2480ECE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF350153-0C11-41EF-B6BC-603A2480ECE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF350153-0C11-41EF-B6BC-603A2480ECE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
