@@ -154,6 +154,9 @@ public class PostgreSqlRepository(
     {
         if (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
             throw new ArgumentException($"{setCode} is not a configured set!");
+
+        var (success, setData) = GetSetDataFromCache(setCode);
+        if (success) return setData;
         
         await using var dataSource = NpgsqlDataSource.Create(_connectionString);
         
@@ -164,8 +167,7 @@ public class PostgreSqlRepository(
         command.Parameters.AddWithValue("@set", setCode);
 
         await using var reader = await command.ExecuteReaderAsync();
-
-        HashSet<Card> cards = [];
+        
         while (await reader.ReadAsync())
         {
             var scryfallId = reader.GetString(0);
@@ -175,10 +177,20 @@ public class PostgreSqlRepository(
             var rarity = Enum.Parse<Rarity>(reader.GetString(4), ignoreCase: true);
             var scryfallUri = reader.GetString(5);
             var imageUri = reader.GetString(6);
-            cards.Add(new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri));
+            setData.Add(new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri));
         }
 
-        return cards;
+        cache.Set($"{setCode}-set-data", setData);
+        return setData;
+    }
+    
+    private (bool success, HashSet<Card> setData) GetSetDataFromCache(string setCode)
+    {
+        if (!cache.TryGetValue($"{setCode}-set-data", out HashSet<Card>? setData)) 
+            return (false,[]);
+        return setData is null
+            ? (false, [])
+            : (true, setData);
     }
 
     public async Task UpsertPulledCardsAsync(Dictionary<Card, int> pulledCards)
