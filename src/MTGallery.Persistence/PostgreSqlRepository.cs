@@ -43,8 +43,8 @@ public class PostgreSqlRepository(
 
     private async Task HydrateSetData()
     {
-        await using var connection = new NpgsqlConnection(_connectionString);
-        await connection.OpenAsync();
+        await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+        await using var connection = await dataSource.OpenConnectionAsync();
 
         await using var truncateCommand = connection.CreateCommand();
         truncateCommand.CommandText = """
@@ -167,8 +167,8 @@ public class PostgreSqlRepository(
 
     public async Task UpsertPulledCardsAsync(Dictionary<Card, int> pulledCards)
     {
-        await using var connection = new NpgsqlConnection(_connectionString);
-        await connection.OpenAsync();
+        await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+        await using var connection = await dataSource.OpenConnectionAsync();
 
         await using var batch = new NpgsqlBatch(connection);
         
