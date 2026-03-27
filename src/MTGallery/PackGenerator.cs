@@ -20,9 +20,10 @@ public class PackGenerator(PostgreSqlRepository repository, ConfiguredSetsOption
             var draws = GenerateRaritiesList(rates);
             var rarity = draws.ElementAt(Random.Shared.Next(0, draws.Count));
 
-            var availableCardsByRarity = setCards.Where(card => card.Rarity == rarity).ToHashSet();
+            var availableCardsByRarity = setCards.Where(card => card.Rarity == rarity).ToArray();
+            Random.Shared.Shuffle(availableCardsByRarity);
             
-            var card = availableCardsByRarity.ElementAt(Random.Shared.Next(0, availableCardsByRarity.Count));
+            var card = availableCardsByRarity.ElementAt(Random.Shared.Next(0, availableCardsByRarity.Length));
             pulledCards.TryGetValue(card, out int count);
             pulledCards[card] = count + 1;
         }
@@ -40,7 +41,7 @@ public class PackGenerator(PostgreSqlRepository repository, ConfiguredSetsOption
             .. Enumerable.Repeat(Rarity.Mythic, pullRates.Mythic)
         ];
         
-        Random.Shared.Shuffle(rarities.ToArray());
+        Random.Shared.Shuffle(rarities);
 
         return rarities.ToList();
     }

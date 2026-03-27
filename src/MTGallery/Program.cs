@@ -26,7 +26,7 @@ var packGenerator = new PackGenerator(postgreSqlRepository, configuredSetsOption
 
 /* ---------------------------------------- Execution ---------------------------------------- */
 
-var pulledCards = await packGenerator.GeneratePack("blb");
+var pulledCards = await packGenerator.GeneratePack("ecl");
 await postgreSqlRepository.UpsertPulledCardsAsync(pulledCards);
 File.WriteAllText(outputOptions.OutputPath, string.Empty);
 File.AppendAllText(outputOptions.OutputPath, """
@@ -40,6 +40,7 @@ File.AppendAllText(outputOptions.OutputPath, """
                                             <tr>
                                             <th>Card</th>
                                             <th>Name</th>
+                                            <th>Set</th>
                                             <th>Rarity</th>
                                             <th>Count</th>
                                             </tr>
@@ -52,6 +53,7 @@ foreach (var (card, count) in await postgreSqlRepository.GetPulledCardsAsync())
                                                  <tr>
                                                  <th><img src="{card.ImageUri}" alt="{card.Name}"></th>
                                                  <th><a href="{card.ScryfallUri}">{card.Name}</a></th>
+                                                 <th>{card.Set}</th>
                                                  <th>{card.Rarity.ToString()}</th>
                                                  <th>{count}</th>
                                                  </tr>
