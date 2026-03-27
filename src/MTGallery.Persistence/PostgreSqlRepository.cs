@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 using MTGallery.Configuration;
 using MTGallery.Domain;
 using Npgsql;
@@ -7,6 +9,7 @@ namespace MTGallery.Persistence;
 
 public class PostgreSqlRepository(
     ScryfallApiClient scryfallApiClient,
+    MemoryCache cache,
     DatabaseConfigurationOptions databaseOptions, 
     ConfiguredSetsOptions configuredSetsOptions)
 {
@@ -116,22 +119,35 @@ public class PostgreSqlRepository(
     {
         if (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
             throw new ArgumentException($"{setCode} is not a configured set!");
+
+        var (success, pullRatesJson) = GetPullRatesFromCache(setCode);
+        if (!success)
+        {
+            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+
+            await using var command = dataSource.CreateCommand();
+            command.CommandText = """
+                                  SELECT pull_rates FROM pull_rates WHERE set = @set LIMIT 1;
+                                  """;
+            command.Parameters.AddWithValue("@set", setCode);
+
+            pullRatesJson = (await command.ExecuteScalarAsync())?.ToString();
+            cache.Set($"{setCode}-pull-rates", pullRatesJson);
+        }
         
-        await using var dataSource = NpgsqlDataSource.Create(_connectionString);
-
-        await using var command = dataSource.CreateCommand();
-        command.CommandText = """
-                              SELECT pull_rates FROM pull_rates WHERE set = @set LIMIT 1;
-                              """;
-        command.Parameters.AddWithValue("@set", setCode);
-
-        var pullRatesJson = (await command.ExecuteScalarAsync())?.ToString();
         if (pullRatesJson is null) throw new ArgumentException($"{setCode} data could not be found!");
-        
         var pullRates = JsonSerializer.Deserialize<List<PullRates>>(pullRatesJson);
-        if (pullRates is null) throw new JsonException($"Could not deserialize pull rates for set {setCode}");
+        
+        return pullRates ?? throw new JsonException($"Could not deserialize pull rates for set {setCode}");
+    }
 
-        return pullRates;
+    private (bool success, string? pullRatesJson) GetPullRatesFromCache(string setCode)
+    {
+        if (!cache.TryGetValue($"{setCode}-pull-rates", out string? pullRatesJson)) 
+            return (false, null);
+        return pullRatesJson is null
+            ? (false, null)
+            : (true, pullRatesJson);
     }
 
     public async Task<HashSet<Card>> GetCardsForSetAsync(string setCode)
