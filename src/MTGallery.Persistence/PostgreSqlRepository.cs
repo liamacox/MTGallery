@@ -201,7 +201,6 @@ public class PostgreSqlRepository(
         
         foreach (var (card, count) in pulledCards) 
         {
-
             var command = new NpgsqlBatchCommand();
             command.CommandText = """
                                   INSERT INTO pulled_cards (scryfall_id, oracle_id, "set", name, rarity, scryfall_uri, image_uri, pull_count)
@@ -249,5 +248,16 @@ public class PostgreSqlRepository(
         }
 
         return cards;
+    }
+
+    public async Task TruncatePulledCardsTable()
+    {
+        await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+
+        await using var command = dataSource.CreateCommand();
+        command.CommandText = """
+                              TRUNCATE TABLE pulled_cards RESTART IDENTITY;
+                              """;
+        await command.ExecuteNonQueryAsync();
     }
 }
