@@ -21,13 +21,28 @@ configuration.GetSection(nameof(ConfiguredSetsOptions)).Bind(configuredSetsOptio
 var cache =  new MemoryCache(new MemoryCacheOptions());
 var client = new ScryfallApiClient();
 var postgreSqlRepository = new PostgreSqlRepository(client, cache, databaseOptions, configuredSetsOptions);
-await postgreSqlRepository.InitializeAsync();
+var initializeTask = postgreSqlRepository.InitializeAsync();
 var packGenerator = new PackGenerator(postgreSqlRepository, configuredSetsOptions);
+await initializeTask;
 
-/* ---------------------------------------- Execution ---------------------------------------- */
+/* ---------------------------------------- User Interface ---------------------------------------- */
 
-var pulledCards = await packGenerator.GeneratePack("blb");
-await postgreSqlRepository.UpsertPulledCardsAsync(pulledCards);
+var input = string.Empty;
+while (input != "q")
+{
+    Console.WriteLine("Choose an option from the following list:");
+    Console.WriteLine("1) Generate a pack");
+    Console.WriteLine("2) Truncate pulled cards table");
+    Console.WriteLine("q) Quit");
+    input = Console.ReadLine();
+    if (input == "1") await GeneratePacksInteractiveAsync();
+    else if (input == "2") await TruncateDataBaseInteractiveAsync();
+    else if (input == "q") Console.WriteLine("Exiting, generating report...");
+    else Console.WriteLine("Invalid input.");
+}
+
+/* ---------------------------------------- Generate Report ---------------------------------------- */
+
 File.WriteAllText(outputOptions.OutputPath, string.Empty);
 File.AppendAllText(outputOptions.OutputPath, """
                                             <!DOCTYPE html>
@@ -91,12 +106,22 @@ File.AppendAllText(outputOptions.OutputPath, """
                                              
                                              function isNumeric(n){ return !isNaN(parseFloat(n)) && isFinite(n); }
                                              
+                                             const rarityRank = {
+                                               'common': 1,
+                                               'uncommon': 2,
+                                               'rare': 3,
+                                               'mythic': 4
+                                             };
+                                             
+                                             function normalize(s){
+                                               return String(s || '').trim().replace(/\s+/g,' ').toLowerCase();
+                                             }
+                                             
                                              function sortTable(colIndex, th) {
                                                const table = document.getElementById('cards');
                                                const tbody = table.tBodies[0];
                                                const rows = Array.from(tbody.rows);
                                                const current = th.dataset.order === 'asc' ? 'desc' : 'asc';
-                                               // reset indicators
                                                table.querySelectorAll('th').forEach(h=>h.dataset.order='');
                                                th.dataset.order = current;
                                              
@@ -104,17 +129,24 @@ File.AppendAllText(outputOptions.OutputPath, """
                                                  let A = getCellValue(a, colIndex);
                                                  let B = getCellValue(b, colIndex);
                                              
+                                                 // If sorting the Rarity column, use defined rank order
+                                                 if (colIndex === 3) {
+                                                   const ra = rarityRank[normalize(A)] || 0;
+                                                   const rb = rarityRank[normalize(B)] || 0;
+                                                   return (ra - rb) * (current === 'asc' ? 1 : -1);
+                                                 }
+                                             
                                                  // numeric compare if both numeric
                                                  if (isNumeric(A) && isNumeric(B)) {
                                                    return (parseFloat(A) - parseFloat(B)) * (current === 'asc' ? 1 : -1);
                                                  }
+                                             
                                                  // case-insensitive string
                                                  A = A.toLowerCase();
                                                  B = B.toLowerCase();
                                                  return A < B ? (current === 'asc' ? -1 : 1) : (A > B ? (current === 'asc' ? 1 : -1) : 0);
                                                });
                                              
-                                               // reattach in sorted order
                                                rows.forEach(r => tbody.appendChild(r));
                                              }
                                              
@@ -127,3 +159,52 @@ File.AppendAllText(outputOptions.OutputPath, """
                                              });
                                              </script>
                                              """);
+return;
+
+/* ---------------------------------------- User Interface Helper Functions ---------------------------------------- */
+
+async Task GeneratePacksInteractiveAsync()
+{
+    var setCode = string.Empty;
+    while (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
+    {
+        Console.WriteLine("Enter a configured set code:");
+        setCode = Console.ReadLine() ?? string.Empty;
+    }
+    
+    Console.WriteLine("How many packs would you like to generate?");
+    int numberOfPacks = 0;
+    while (!int.TryParse(Console.ReadLine(), out numberOfPacks))
+    {
+        Console.WriteLine("Please enter a valid natural number!");
+    }
+    foreach(var pack in Enumerable.Range(0, numberOfPacks))
+    {
+        var pulledCards = await packGenerator.GeneratePack(setCode);
+        var upsertTask = postgreSqlRepository.UpsertPulledCardsAsync(pulledCards);
+        Console.WriteLine("Pulled the following cards:");
+        foreach (var (card, count) in pulledCards)
+        {
+            Console.WriteLine($"{count} {card.Name}");
+        }
+
+        await upsertTask;
+    }
+}
+
+async Task TruncateDataBaseInteractiveAsync()
+{
+    Console.WriteLine("Are you sure you want to reset the pulled cards table? This action cannot be undone!");
+    Console.WriteLine("Enter Y to proceed and any other key to cancel:");
+
+    if (Console.ReadLine() == "Y")
+    {
+        var truncateTask = postgreSqlRepository.TruncatePulledCardsTable();
+        Console.WriteLine("Truncating table!!!");
+        await truncateTask;
+    }
+    else
+    {
+        Console.WriteLine("Cancelled.");
+    }
+}
