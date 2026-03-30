@@ -180,7 +180,7 @@ async Task GeneratePacksInteractiveAsync()
     }
     foreach(var pack in Enumerable.Range(0, numberOfPacks))
     {
-        var pulledCards = await packGenerator.GeneratePack(setCode);
+        var pulledCards = await packGenerator.GeneratePacks(setCode);
         var upsertTask = postgreSqlRepository.UpsertPulledCardsAsync(pulledCards);
         Console.WriteLine("Pulled the following cards:");
         foreach (var (card, count) in pulledCards)
