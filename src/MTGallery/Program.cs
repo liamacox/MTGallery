@@ -31,7 +31,7 @@ var input = string.Empty;
 while (input != "q")
 {
     Console.WriteLine("Choose an option from the following list:");
-    Console.WriteLine("1) Generate a pack");
+    Console.WriteLine("1) Generate packs");
     Console.WriteLine("2) Truncate pulled cards table");
     Console.WriteLine("q) Quit");
     input = Console.ReadLine();
