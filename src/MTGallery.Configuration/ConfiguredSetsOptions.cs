@@ -2,6 +2,6 @@
 
 public class ConfiguredSetsOptions
 {
-    public HashSet<string> ConfiguredSets { get; set; }
-    public bool HydrateSetData { get; set; }
+    public required HashSet<string> ConfiguredSets { get; init; }
+    public required bool HydrateSetData { get; init; }
 }

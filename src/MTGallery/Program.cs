@@ -9,12 +9,14 @@ using MTGallery.Persistence;
 var configurationBuilder = new ConfigurationBuilder().AddJsonFile(@"C:\Users\Liam Cox\git\MTGallery\appsettings.json", optional: false);
 var configuration =  configurationBuilder.Build();
 
-var outputOptions = new OutputOptions();
-configuration.GetSection(nameof(OutputOptions)).Bind(outputOptions);
-var databaseOptions = new DatabaseConfigurationOptions();
-configuration.GetSection(nameof(DatabaseConfigurationOptions)).Bind(databaseOptions);
-var configuredSetsOptions = new ConfiguredSetsOptions();
-configuration.GetSection(nameof(ConfiguredSetsOptions)).Bind(configuredSetsOptions);
+var outputOptions = configuration.GetSection(nameof(OutputOptions)).Get<OutputOptions>() 
+                    ?? throw new NullReferenceException("Failed to load configuration!");
+
+var databaseOptions = configuration.GetSection(nameof(DatabaseConfigurationOptions)).Get<DatabaseConfigurationOptions>() 
+                      ?? throw new  NullReferenceException("Failed to load configuration!");
+
+var configuredSetsOptions = configuration.GetSection(nameof(ConfiguredSetsOptions)).Get<ConfiguredSetsOptions>() 
+                            ?? throw new NullReferenceException("Failed to load configuration!");
 
 /* ---------------------------------------- DI ---------------------------------------- */
 

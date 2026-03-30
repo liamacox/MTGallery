@@ -2,5 +2,5 @@
 
 public sealed class OutputOptions
 {
-    public string OutputPath { get; set; }
+    public required string OutputPath { get; init; }
 }
