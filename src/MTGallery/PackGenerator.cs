@@ -6,7 +6,7 @@ namespace MTGallery;
 
 public class PackGenerator(PostgreSqlRepository repository, ConfiguredSetsOptions configuredSetsOptions)
 {
-    public async Task<Dictionary<Card, int>> GeneratePack(string setCode)
+    public async Task<Dictionary<Card, int>> GeneratePacks(string setCode, int numberOfPacks = 1)
     {
         if (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
             throw new ArgumentException($"{setCode} is not a configured set!");
@@ -14,20 +14,22 @@ public class PackGenerator(PostgreSqlRepository repository, ConfiguredSetsOption
         var pullRates = await repository.GetPullRatesForSetAsync(setCode);
         var setCards = await repository.GetCardsForSetAsync(setCode);
         Dictionary<Card, int> pulledCards = [];
-        
-        foreach (var rates in pullRates)
+        foreach (var pack in Enumerable.Range(0, numberOfPacks))
         {
-            var draws = GenerateRaritiesList(rates);
-            var rarity = draws.ElementAt(Random.Shared.Next(0, draws.Count));
+            foreach (var rates in pullRates)
+            {
+                var draws = GenerateRaritiesList(rates);
+                var rarity = draws.ElementAt(Random.Shared.Next(0, draws.Count));
 
-            var availableCardsByRarity = setCards.Where(card => card.Rarity == rarity).ToArray();
-            Random.Shared.Shuffle(availableCardsByRarity);
-            
-            var card = availableCardsByRarity.ElementAt(Random.Shared.Next(0, availableCardsByRarity.Length));
-            pulledCards.TryGetValue(card, out int count);
-            pulledCards[card] = count + 1;
+                var availableCardsByRarity = setCards.Where(card => card.Rarity == rarity).ToArray();
+                Random.Shared.Shuffle(availableCardsByRarity);
+
+                var card = availableCardsByRarity.ElementAt(Random.Shared.Next(0, availableCardsByRarity.Length));
+                pulledCards.TryGetValue(card, out int count);
+                pulledCards[card] = count + 1;
+            }
         }
-        
+
         return pulledCards;
     }
 
