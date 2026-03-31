@@ -10,10 +10,14 @@ public class PackGenerator(PostgreSqlRepository repository, ConfiguredSetsOption
     {
         if (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
             throw new ArgumentException($"{setCode} is not a configured set!");
+
+        var pullRatesTask = repository.GetPullRatesForSetAsync(setCode);
+        var setCardsTask = repository.GetCardsForSetAsync(setCode);
         
-        var pullRates = await repository.GetPullRatesForSetAsync(setCode);
-        var setCards = await repository.GetCardsForSetAsync(setCode);
         Dictionary<Card, int> pulledCards = [];
+        var pullRates = await pullRatesTask;
+        var setCards = await setCardsTask;
+        
         foreach (var pack in Enumerable.Range(0, numberOfPacks))
         {
             foreach (var rates in pullRates)
