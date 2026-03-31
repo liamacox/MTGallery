@@ -118,34 +118,33 @@ public class PostgreSqlRepository(
         if (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
             throw new ArgumentException($"{setCode} is not a configured set!");
 
-        var (success, pullRatesJson) = GetPullRatesFromCache(setCode);
-        if (!success)
-        {
-            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+        var (success, pullRatesList) = GetPullRatesFromCache(setCode);
+        if (success) return pullRatesList;
+        
+        await using var dataSource = NpgsqlDataSource.Create(_connectionString);
 
-            await using var command = dataSource.CreateCommand();
-            command.CommandText = """
-                                  SELECT pull_rates FROM pull_rates WHERE set = @set LIMIT 1;
-                                  """;
-            command.Parameters.AddWithValue("@set", setCode);
+        await using var command = dataSource.CreateCommand();
+        command.CommandText = """
+                              SELECT pull_rates FROM pull_rates WHERE set = @set LIMIT 1;
+                              """;
+        command.Parameters.AddWithValue("@set", setCode);
 
-            pullRatesJson = (await command.ExecuteScalarAsync())?.ToString();
-            cache.Set($"{setCode}-pull-rates", pullRatesJson);
-        }
+        var pullRatesJson = (await command.ExecuteScalarAsync())?.ToString();
         
         if (pullRatesJson is null) throw new ArgumentException($"{setCode} data could not be found!");
-        var pullRates = JsonSerializer.Deserialize<List<PullRates>>(pullRatesJson);
+        pullRatesList = JsonSerializer.Deserialize<List<PullRates>>(pullRatesJson);
+        if (pullRatesList is null) throw new JsonException($"Could not deserialize pull rates for set {setCode}");
+        cache.Set($"{setCode}-pull-rates", pullRatesList);
         
-        return pullRates ?? throw new JsonException($"Could not deserialize pull rates for set {setCode}");
+        return pullRatesList;
     }
 
-    private (bool success, string? pullRatesJson) GetPullRatesFromCache(string setCode)
+    private (bool success, List<PullRates> pullRatesJson) GetPullRatesFromCache(string setCode)
     {
-        if (!cache.TryGetValue($"{setCode}-pull-rates", out string? pullRatesJson)) 
-            return (false, null);
-        return pullRatesJson is null
-            ? (false, null)
-            : (true, pullRatesJson);
+        if (!cache.TryGetValue($"{setCode}-pull-rates", out List<PullRates>? pullRates)) 
+            return (false, []);
+        
+        return (pullRates is not null, pullRates ?? []);
     }
 
     public async Task<HashSet<Card>> GetCardsForSetAsync(string setCode)
@@ -186,9 +185,8 @@ public class PostgreSqlRepository(
     {
         if (!cache.TryGetValue($"{setCode}-set-data", out HashSet<Card>? setData)) 
             return (false,[]);
-        return setData is null
-            ? (false, [])
-            : (true, setData);
+        
+        return (setData is not null, setData ?? []);
     }
 
     public async Task UpsertPulledCardsAsync(Dictionary<Card, int> pulledCards)
