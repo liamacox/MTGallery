@@ -4,9 +4,9 @@ using MTGallery.Domain;
 
 namespace MTGallery.Persistence;
 
-public class ScryfallApiClient()
+public static class ScryfallApiClient
 {
-    public List<Card> GetSetData(string setCode)
+    public static List<Card> GetSetData(string setCode)
     {
         List<Card> cards = [];
         
@@ -23,7 +23,8 @@ public class ScryfallApiClient()
         
         cards.AddRange(
             responseJson.RootElement.GetProperty("data").EnumerateArray()
-            .Select<JsonElement, Card>(Card.BuildCardFromJson));
+                .Where(jsonElement => jsonElement.GetProperty("games").ToString().Contains("paper"))
+                .Select<JsonElement, Card>(Card.BuildCardFromJson));
         
         while (responseJson.RootElement.GetProperty("has_more").GetBoolean())
         {
@@ -34,6 +35,7 @@ public class ScryfallApiClient()
             
             cards.AddRange(
                 responseJson.RootElement.GetProperty("data").EnumerateArray()
+                    .Where(jsonElement => jsonElement.GetProperty("games").ToString().Contains("paper"))
                     .Select<JsonElement, Card>(Card.BuildCardFromJson));
         }
         
