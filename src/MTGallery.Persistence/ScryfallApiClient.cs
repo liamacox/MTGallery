@@ -4,9 +4,9 @@ using MTGallery.Domain;
 
 namespace MTGallery.Persistence;
 
-public class ScryfallApiClient()
+public static class ScryfallApiClient
 {
-    public List<Card> GetSetData(string setCode)
+    public static List<Card> GetSetData(string setCode)
     {
         List<Card> cards = [];
         

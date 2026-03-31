@@ -7,7 +7,6 @@ using Npgsql;
 namespace MTGallery.Persistence;
 
 public class PostgreSqlRepository(
-    ScryfallApiClient scryfallApiClient,
     MemoryCache cache,
     DatabaseConfigurationOptions databaseOptions, 
     ConfiguredSetsOptions configuredSetsOptions)
@@ -56,7 +55,7 @@ public class PostgreSqlRepository(
 
         foreach (var setCode in configuredSetsOptions.ConfiguredSets)
         {
-            var cards = scryfallApiClient.GetSetData(setCode);
+            var cards = ScryfallApiClient.GetSetData(setCode);
             
             await using var batch = new NpgsqlBatch(connection);
             foreach (var card in cards)

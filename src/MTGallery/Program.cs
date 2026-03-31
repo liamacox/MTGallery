@@ -21,8 +21,7 @@ var configuredSetsOptions = configuration.GetSection(nameof(ConfiguredSetsOption
 /* ---------------------------------------- DI ---------------------------------------- */
 
 var cache =  new MemoryCache(new MemoryCacheOptions());
-var client = new ScryfallApiClient();
-var postgreSqlRepository = new PostgreSqlRepository(client, cache, databaseOptions, configuredSetsOptions);
+var postgreSqlRepository = new PostgreSqlRepository(cache, databaseOptions, configuredSetsOptions);
 var initializeTask = postgreSqlRepository.InitializeAsync();
 var packGenerator = new PackGenerator(postgreSqlRepository, configuredSetsOptions);
 await initializeTask;
