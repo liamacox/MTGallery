@@ -33,12 +33,14 @@ while (input is not "q")
 {
     Console.WriteLine("Choose an option from the following list:");
     Console.WriteLine("1) Generate packs");
-    Console.WriteLine("2) Truncate pulled cards table");
+    Console.WriteLine("2) Load a commander set");
     Console.WriteLine("3) Generate HTML report");
+    Console.WriteLine("T) Truncate pulled cards table");
     Console.WriteLine("q) Quit");
     input = Console.ReadLine();
     if (input is "1") await GeneratePacksInteractiveAsync();
-    else if (input is "2") await TruncateDataBaseInteractiveAsync();
+    else if (input is "2") await LoadCommanderSetAsync();
+    else if (input is "T") await TruncateDataBaseInteractiveAsync();
     else if (input is "q" or "3")
     {
         await WriteHtmlReportAsync();
@@ -51,13 +53,28 @@ return;
 
 /* ---------------------------------------- User Interface Helper Functions ---------------------------------------- */
 
+async Task LoadCommanderSetAsync()
+{
+    var setCode = string.Empty;
+    while (!configuredSetsOptions.ConfiguredCommanderSets.Contains(setCode))
+    {
+        Console.WriteLine("Enter a configured set code (or enter c to cancel):");
+        setCode = Console.ReadLine() ?? string.Empty;
+        if (setCode is "c") return;
+    }
+
+    var commanderCards = await postgreSqlRepository.GetCardsForSetAsync(setCode);
+    await postgreSqlRepository.UpsertCommanderCardsAsync(commanderCards);
+}
+
 async Task GeneratePacksInteractiveAsync()
 {
     var setCode = string.Empty;
     while (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
     {
-        Console.WriteLine("Enter a configured set code:");
+        Console.WriteLine("Enter a configured set code (or enter c to cancel):");
         setCode = Console.ReadLine() ?? string.Empty;
+        if (setCode is "c") return;
     }
     
     Console.WriteLine("How many packs would you like to generate?");
