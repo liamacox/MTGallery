@@ -218,6 +218,36 @@ public class PostgreSqlRepository(
         }
         await batch.ExecuteNonQueryAsync();
     }
+    
+    public async Task UpsertCommanderCardsAsync(HashSet<Card> commanderCards)
+    {
+        await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+        await using var connection = await dataSource.OpenConnectionAsync();
+
+        await using var batch = new NpgsqlBatch(connection);
+        
+        foreach (var card in commanderCards) 
+        {
+            var command = new NpgsqlBatchCommand();
+            command.CommandText = """
+                                  INSERT INTO pulled_cards (scryfall_id, oracle_id, "set", name, rarity, scryfall_uri, image_uri, pull_count)
+                                  VALUES (@scryfall_id, @oracle_id, @set, @name, @rarity, @scryfall_uri, @image_uri, @pull_count)
+                                  ON CONFLICT (scryfall_id)
+                                  DO NOTHING;
+                                  """;
+            command.Parameters.AddWithValue("@scryfall_id", card.ScryfallId);
+            command.Parameters.AddWithValue("@oracle_id", card.OracleId);
+            command.Parameters.AddWithValue("@set", card.Set);
+            command.Parameters.AddWithValue("@name", card.Name);
+            command.Parameters.AddWithValue("@rarity", card.Rarity.ToString());
+            command.Parameters.AddWithValue("@scryfall_uri", card.ScryfallUri);
+            command.Parameters.AddWithValue("@image_uri", card.ImageUri);
+            command.Parameters.AddWithValue("@pull_count", 1);
+
+            batch.BatchCommands.Add(command);
+        }
+        await batch.ExecuteNonQueryAsync();
+    }
 
     public async Task<List<(Card card, int count)>> GetPulledCardsAsync()
     {
