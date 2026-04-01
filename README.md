@@ -13,8 +13,9 @@
         "Database": "<Database name>"
     },
     "ConfiguredSetsOptions": {
-        "ConfiguredSets": ["<comma seperated list of setcodes>"],
-        "HydrateSetData": "<true/false>"
+        "ConfiguredSets": [<"comma", "seperated", "list", "of", "standard", "setcodes">],
+        "ConfiguredCommanderSets": [<"comma", "seperated", "list", "of", "commander", "setcodes">],   
+        "HydrateSetData": <true/false>
     }
 }
 ```
