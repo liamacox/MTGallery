@@ -53,7 +53,7 @@ public class PostgreSqlRepository(
                                       """;
         await truncateCommand.ExecuteNonQueryAsync();
 
-        foreach (var setCode in configuredSetsOptions.ConfiguredSets)
+        foreach (var setCode in configuredSetsOptions.ConfiguredSets.Concat(configuredSetsOptions.ConfiguredCommanderSets))
         {
             var cards = ScryfallApiClient.GetSetData(setCode);
             
