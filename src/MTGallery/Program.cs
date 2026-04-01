@@ -130,6 +130,7 @@ async Task WriteHtmlReportAsync()
                                                  <th>Set</th>
                                                  <th>Rarity</th>
                                                  <th>Count</th>
+                                                 <th>Commander</th>
                                                  </tr>
                                                  </thead>
                                                  <tbody>
@@ -145,6 +146,7 @@ async Task WriteHtmlReportAsync()
                                                                  <th>{card.Set}</th>
                                                                  <th>{card.Rarity.ToString()}</th>
                                                                  <th>{count}</th>
+                                                                 <th>{(configuredSetsOptions.ConfiguredCommanderSets.Contains(card.Set) ? "Yes" : "No")}</th>
                                                                  </tr>
                                                                  """);
     }
