@@ -141,7 +141,7 @@ async Task WriteHtmlReportAsync()
 
                                                                  <tr>
                                                                  <th><img src="{card.ImageUri}" alt="{card.Name}"></th>
-                                                                 <th><a href="{card.ScryfallUri}">{card.Name}</a></th>
+                                                                 <th><a href="{card.ScryfallUri}" target="_blank" rel="noopener noreferrer">{card.Name}</a></th>
                                                                  <th>{card.Set}</th>
                                                                  <th>{card.Rarity.ToString()}</th>
                                                                  <th>{count}</th>
