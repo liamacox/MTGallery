@@ -53,7 +53,7 @@ public class PostgreSqlRepository(
                                       """;
         await truncateCommand.ExecuteNonQueryAsync();
 
-        foreach (var setCode in configuredSetsOptions.ConfiguredSets.Concat(configuredSetsOptions.ConfiguredCommanderSets))
+        foreach (var setCode in configuredSetsOptions.AllConfiguredSets)
         {
             var cards = ScryfallApiClient.GetSetData(setCode);
             
@@ -149,7 +149,7 @@ public class PostgreSqlRepository(
 
     public async Task<HashSet<Card>> GetCardsForSetAsync(string setCode)
     {
-        if (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
+        if (!configuredSetsOptions.AllConfiguredSets.Contains(setCode))
             throw new ArgumentException($"{setCode} is not a configured set!");
 
         var (success, setData) = GetSetDataFromCache(setCode);
