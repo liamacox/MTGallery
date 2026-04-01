@@ -122,6 +122,7 @@ async Task WriteHtmlReportAsync()
                                                  <title>Cards</title>
                                                  </head>
                                                  <body>
+                                                 <button id="toggle-commander-only">Hide commander-only cards</button>
                                                  <table id="cards">
                                                  <thead>
                                                  <tr>
@@ -130,6 +131,7 @@ async Task WriteHtmlReportAsync()
                                                  <th>Set</th>
                                                  <th>Rarity</th>
                                                  <th>Count</th>
+                                                 <th>Commander</th>
                                                  </tr>
                                                  </thead>
                                                  <tbody>
@@ -140,11 +142,12 @@ async Task WriteHtmlReportAsync()
         await File.AppendAllTextAsync(outputOptions.OutputPath, $"""
 
                                                                  <tr>
-                                                                 <th><img src="{card.ImageUri}" alt="{card.Name}"></th>
-                                                                 <th><a href="{card.ScryfallUri}">{card.Name}</a></th>
+                                                                 <th><a href="{card.ScryfallUri}" target="_blank" rel="noopener noreferrer"><img src="{card.ImageUri}" alt="{card.Name}"></a></th>
+                                                                 <th><a href="{card.ScryfallUri}" target="_blank" rel="noopener noreferrer">{card.Name}</a></th>
                                                                  <th>{card.Set}</th>
                                                                  <th>{card.Rarity.ToString()}</th>
                                                                  <th>{count}</th>
+                                                                 <th>{(configuredSetsOptions.ConfiguredCommanderSets.Contains(card.Set) ? "Yes" : "No")}</th>
                                                                  </tr>
                                                                  """);
     }
@@ -228,6 +231,31 @@ async Task WriteHtmlReportAsync()
                                                               setTh.dataset.order = 'desc'; // set opposite so sortTable toggles to 'asc'
                                                               sortTable(2, setTh);
                                                             });
+                                                            
+                                                            // index of the "Commander" column (0-based). Change if needed.
+                                                            const commanderColIndex = 5;
+                                                            
+                                                            const toggleBtn = document.getElementById('toggle-commander-only');
+                                                            let hideCommanderOnly = false;
+                                                            
+                                                            toggleBtn.addEventListener('click', () => {
+                                                              hideCommanderOnly = !hideCommanderOnly;
+                                                              toggleBtn.textContent = hideCommanderOnly ? 'Show commander-only cards' : 'Hide commander-only cards';
+                                                              applyCommanderFilter();
+                                                            });
+                                                            
+                                                            function applyCommanderFilter() {
+                                                              const table = document.getElementById('cards');
+                                                              const tbody = table.tBodies[0];
+                                                              Array.from(tbody.rows).forEach(row => {
+                                                                const val = normalize(getCellValue(row, commanderColIndex));
+                                                                if (hideCommanderOnly && val === 'yes') {
+                                                                  row.style.display = 'none';
+                                                                } else {
+                                                                  row.style.display = '';
+                                                                }
+                                                              });
+                                                            }
                                                             </script>
                                                             """);
 }
