@@ -167,6 +167,13 @@ async Task WriteHtmlReportAsync()
                                                               th.style.cursor = 'pointer';
                                                               th.addEventListener('click', () => sortTable(index, th));
                                                             });
+                                                            
+                                                            document.querySelectorAll('#cards thead th').forEach((th) => {
+                                                              const span = document.createElement('span');
+                                                              span.className = 'sort-indicator';
+                                                              span.textContent = ''; // will be filled by sortTable
+                                                              th.appendChild(span);
+                                                            });
 
                                                             function getCellValue(row, idx) {
                                                               const cell = row.children[idx];
@@ -195,8 +202,13 @@ async Task WriteHtmlReportAsync()
                                                               const table = document.getElementById('cards');
                                                               const tbody = table.tBodies[0];
                                                               const rows = Array.from(tbody.rows);
-                                                              const current = th.dataset.order === 'asc' ? 'desc' : 'asc';
-                                                              table.querySelectorAll('th').forEach(h=>h.dataset.order='');
+                                                              const current = th.dataset.order === 'asc' ? 'desc' : 'asc'; 
+                                                              // clear order and indicators on all headers 
+                                                              table.querySelectorAll('th').forEach(h => { 
+                                                                h.dataset.order = ''; 
+                                                                const ind = h.querySelector('.sort-indicator'); 
+                                                                if (ind) ind.textContent = ''; 
+                                                              });
                                                               th.dataset.order = current;
 
                                                               rows.sort((a,b) => {
@@ -222,6 +234,12 @@ async Task WriteHtmlReportAsync()
                                                               });
 
                                                               rows.forEach(r => tbody.appendChild(r));
+                                                              // set indicator on active header
+                                                              const indicator = th.querySelector('.sort-indicator');
+                                                              if (indicator) indicator.textContent = (current === 'asc') ? '▲' : '▼';
+                                                            
+                                                              // re-apply any filters (if you have that)
+                                                              if (typeof applyCommanderFilter === 'function') applyCommanderFilter();
                                                             }
 
                                                             // Default sort by "Set" column (index 2) ascending on load
@@ -257,5 +275,18 @@ async Task WriteHtmlReportAsync()
                                                               });
                                                             }
                                                             </script>
+                                                            """);
+    await File.AppendAllTextAsync(outputOptions.OutputPath, """
+                                                            <style>
+                                                              #cards thead th { position: relative; padding-right: 1.2em; }
+                                                              .sort-indicator {
+                                                                position: absolute;
+                                                                right: 6px;
+                                                                top: 50%;
+                                                                transform: translateY(-50%);
+                                                                font-size: 0.8em;
+                                                                pointer-events: none;
+                                                              }
+                                                            </style>
                                                             """);
 }
