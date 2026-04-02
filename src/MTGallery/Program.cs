@@ -164,7 +164,8 @@ async Task WriteHtmlReportAsync()
     await File.AppendAllTextAsync(outputOptions.OutputPath, """
                                                             <script>
                                                             document.querySelectorAll('#cards thead th').forEach((th, index) => {
-                                                              th.style.cursor = 'pointer';
+                                                              th.style.cursor = index === 0 ? '' : 'pointer';
+                                                              if (index === 0) return;
                                                               th.addEventListener('click', () => sortTable(index, th));
                                                             });
                                                             
