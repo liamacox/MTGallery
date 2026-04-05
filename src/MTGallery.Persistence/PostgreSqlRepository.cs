@@ -55,10 +55,10 @@ public class PostgreSqlRepository(
 
         foreach (var setCode in configuredSetsOptions.AllConfiguredSets)
         {
-            var cards = await ScryfallApiClient.GetSetDataAsync(setCode);
+            var cards = ScryfallApiClient.GetSetDataAsync(setCode);
             
             await using var batch = new NpgsqlBatch(connection);
-            foreach (var card in cards)
+            foreach (var card in await cards)
             {
                 var command = new NpgsqlBatchCommand();
                 command.CommandText = """
