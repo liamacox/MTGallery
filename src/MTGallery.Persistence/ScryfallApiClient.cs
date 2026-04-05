@@ -6,7 +6,7 @@ namespace MTGallery.Persistence;
 
 public static class ScryfallApiClient
 {
-    public static List<Card> GetSetData(string setCode)
+    public static async Task<List<Card>> GetSetDataAsync(string setCode)
     {
         List<Card> cards = [];
         
@@ -20,8 +20,8 @@ public static class ScryfallApiClient
         JsonDocument responseJson;
         do
         {
-            var response = client.GetAsync(queryString).Result;
-            responseJson = JsonDocument.Parse(response.Content.ReadAsStringAsync().Result);
+            var response = await client.GetAsync(queryString);
+            responseJson = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
             if (!response.IsSuccessStatusCode) throw new ArgumentException(response.ReasonPhrase);
 
             cards.AddRange(
