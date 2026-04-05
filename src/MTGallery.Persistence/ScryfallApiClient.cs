@@ -15,29 +15,23 @@ public static class ScryfallApiClient
         client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
         client.DefaultRequestHeaders.Add("User-Agent", "MTGallery/1.0");
-
+        
         var queryString = $"https://api.scryfall.com/cards/search?order=rarity&q=set%3A{setCode}";
-        var response = client.GetAsync(queryString).Result;
-        if (!response.IsSuccessStatusCode) throw new ArgumentException(response.ReasonPhrase);
-        var responseJson = JsonDocument.Parse(response.Content.ReadAsStringAsync().Result);
-        
-        cards.AddRange(
-            responseJson.RootElement.GetProperty("data").EnumerateArray()
-                .Where(jsonElement => jsonElement.GetProperty("games").ToString().Contains("paper"))
-                .Select<JsonElement, Card>(Card.BuildCardFromJson));
-        
-        while (responseJson.RootElement.GetProperty("has_more").GetBoolean())
+        JsonDocument responseJson;
+        do
         {
-            Thread.Sleep(500);
-            response = client.GetAsync(responseJson.RootElement.GetProperty("next_page").GetString()).Result;
+            var response = client.GetAsync(queryString).Result;
             responseJson = JsonDocument.Parse(response.Content.ReadAsStringAsync().Result);
             if (!response.IsSuccessStatusCode) throw new ArgumentException(response.ReasonPhrase);
-            
+
             cards.AddRange(
                 responseJson.RootElement.GetProperty("data").EnumerateArray()
                     .Where(jsonElement => jsonElement.GetProperty("games").ToString().Contains("paper"))
                     .Select<JsonElement, Card>(Card.BuildCardFromJson));
-        }
+            
+            queryString = responseJson.RootElement.GetProperty("next_page").GetString();
+            Thread.Sleep(500);
+        } while (responseJson.RootElement.GetProperty("has_more").GetBoolean());
         
         return cards;
     }
