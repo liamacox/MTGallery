@@ -71,5 +71,6 @@ public enum Rarity
     Common,
     Uncommon,
     Rare,
-    Mythic
+    Mythic,
+    SpecialGuest
 }
