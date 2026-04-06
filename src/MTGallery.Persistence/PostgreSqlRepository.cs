@@ -33,9 +33,11 @@ public class PostgreSqlRepository(
                                   name TEXT NOT NULL,
                                   rarity TEXT NOT NULL,
                                   scryfall_uri TEXT NOT NULL,
-                                  image_uri TEXT NOT NULL
+                                  image_uri TEXT NOT NULL,
+                                  collector_number INTEGER NOT NULL
                                   );
                               CREATE INDEX IF NOT EXISTS idx_set ON set_data(set);
+                              CREATE INDEX IF NOT EXISTS idx_collector_number on set_data(collector_number);
                               """;
         await command.ExecuteNonQueryAsync();
         
@@ -101,6 +103,7 @@ public class PostgreSqlRepository(
                               rarity TEXT NOT NULL,
                               scryfall_uri TEXT NOT NULL,
                               image_uri TEXT NOT NULL,
+                              collector_number INTEGER NOT NULL,
                               pull_count INTEGER DEFAULT 1 NOT NULL
                               );
                               """;
