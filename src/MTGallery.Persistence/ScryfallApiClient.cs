@@ -50,6 +50,7 @@ public static class ScryfallApiClient
         JsonDocument responseJson;
         do
         {
+            Thread.Sleep(200);
             var response = await client.GetAsync(queryString);
             responseJson = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
             if (!response.IsSuccessStatusCode) throw new ArgumentException(response.ReasonPhrase);
@@ -60,7 +61,6 @@ public static class ScryfallApiClient
                     .Select<JsonElement, Card>(card => Card.BuildSpecialGuestCardFromJson(card, setCode)));
             
             queryString = responseJson.RootElement.GetProperty("next_page").GetString();
-            Thread.Sleep(500);
         } while (responseJson.RootElement.GetProperty("has_more").GetBoolean());
         
         return cards;
