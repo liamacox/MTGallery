@@ -188,7 +188,7 @@ public class PostgreSqlRepository(
     }
 
     private const string SpecialGuestSetCode = "spg";
-    public async Task<HashSet<Card>> GetSpecialGuestCardsInRange(int lowerBound, int upperBound)
+    public async Task<HashSet<Card>> GetSpecialGuestCardsInRangeAsync(int lowerBound, int upperBound)
     {
         if (!configuredSetsOptions.SpecialGuestsEnabled)
             throw new ArgumentException("Special guests are not enabled!!!");
