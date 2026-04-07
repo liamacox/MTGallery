@@ -20,6 +20,7 @@ public static class ScryfallApiClient
         JsonDocument responseJson;
         do
         {
+            Thread.Sleep(200);
             var response = await client.GetAsync(queryString);
             responseJson = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
             if (!response.IsSuccessStatusCode) throw new ArgumentException(response.ReasonPhrase);
@@ -28,9 +29,11 @@ public static class ScryfallApiClient
                 responseJson.RootElement.GetProperty("data").EnumerateArray()
                     .Where(jsonElement => jsonElement.GetProperty("games").ToString().Contains("paper"))
                     .Select<JsonElement, Card>(Card.BuildCardFromJson));
-            
-            queryString = responseJson.RootElement.GetProperty("next_page").GetString();
-            Thread.Sleep(500);
+
+            if (responseJson.RootElement.GetProperty("has_more").GetBoolean())
+            {
+                queryString = responseJson.RootElement.GetProperty("next_page").GetString();
+            }
         } while (responseJson.RootElement.GetProperty("has_more").GetBoolean());
         
         return cards;

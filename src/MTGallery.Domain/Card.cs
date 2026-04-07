@@ -11,7 +11,8 @@ public record Card(
     string Set,
     string OracleId,
     string ScryfallUri,
-    string ImageUri)
+    string ImageUri,
+    int CollectorNumber)
 { 
     public static Card BuildCardFromJson(JsonElement cardJson)
     {
@@ -24,14 +25,15 @@ public record Card(
             var imageUri = GetImageUri(cardJson);
             var set = cardJson.GetProperty("set").GetString()!;
             var scryfallId = cardJson.GetProperty("id").GetString()!;
-            return new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri);
+            var collectorNumber = int.Parse(cardJson.GetProperty("collector_number").GetString()!);
+            return new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri, collectorNumber);
         }
         catch (Exception)
         {
             throw new ArgumentException($"Could not parse {cardJson.ToString()}");
         }
     }
-
+    
     private static string GetImageUri(JsonElement cardJson)
     {
         if (cardJson.TryGetProperty("image_uris", out var imageUris))
@@ -52,5 +54,6 @@ public enum Rarity
     Common,
     Uncommon,
     Rare,
-    Mythic
+    Mythic,
+    SpecialGuest
 }
