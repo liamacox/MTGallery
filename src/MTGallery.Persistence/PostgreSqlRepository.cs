@@ -153,7 +153,8 @@ public class PostgreSqlRepository(
 
     public async Task<HashSet<Card>> GetCardsForSetAsync(string setCode)
     {
-        if (!configuredSetsOptions.AllConfiguredSets.Contains(setCode))
+        if (!configuredSetsOptions.AllConfiguredSets.Contains(setCode) 
+             && (setCode == SpecialGuestSetCode && !configuredSetsOptions.SpecialGuestsEnabled))
             throw new ArgumentException($"{setCode} is not a configured set!");
 
         var (success, setData) = GetSetDataFromCache(setCode);
@@ -185,6 +186,24 @@ public class PostgreSqlRepository(
         cache.Set($"{setCode}-set-data", setData);
         return setData;
     }
+
+    private const string SpecialGuestSetCode = "spg";
+    public async Task<HashSet<Card>> GetSpecialGuestCardsInRange(int lowerBound, int upperBound)
+    {
+        if (!configuredSetsOptions.SpecialGuestsEnabled)
+            throw new ArgumentException("Special guests are not enabled!!!");
+
+        var (success, setData) = GetSetDataFromCache(SpecialGuestSetCode);
+        if (!success)
+        {
+            setData = await GetCardsForSetAsync(SpecialGuestSetCode);
+
+            cache.Set($"{SpecialGuestSetCode}-set-data", setData);
+        }
+        
+        return setData.Where(card => card.CollectorNumber >= lowerBound && card.CollectorNumber <= upperBound)
+                      .ToHashSet();
+    }
     
     private (bool success, HashSet<Card> setData) GetSetDataFromCache(string setCode)
     {
@@ -205,7 +224,7 @@ public class PostgreSqlRepository(
         {
             var command = new NpgsqlBatchCommand();
             command.CommandText = """
-                                  INSERT INTO pulled_cards (scryfall_id, oracle_id, "set", name, rarity, scryfall_uri, image_uri, collector_number pull_count)
+                                  INSERT INTO pulled_cards (scryfall_id, oracle_id, "set", name, rarity, scryfall_uri, image_uri, collector_number, pull_count)
                                   VALUES (@scryfall_id, @oracle_id, @set, @name, @rarity, @scryfall_uri, @image_uri, @collector_number, @pull_count)
                                   ON CONFLICT (scryfall_id)
                                   DO UPDATE SET pull_count = pulled_cards.pull_count + EXCLUDED.pull_count;
