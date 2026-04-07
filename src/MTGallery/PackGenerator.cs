@@ -56,7 +56,7 @@ public class PackGenerator(PostgreSqlRepository repository, ConfiguredSetsOption
     
     private bool IsSpecialGuestCard(string setCode, int cardNumber)
     {
-        if (cardNumber is not SpecialGuestPull || !configuredSetsOptions.SpecialGuestsEnabled) return false;
+        if (!configuredSetsOptions.SpecialGuestsEnabled || cardNumber is not SpecialGuestPull) return false;
         
         var spgRates = configuredSetsOptions.SpecialGuestRatesBySet[setCode].Split(',');
         var numerator = int.Parse(spgRates[0]);
