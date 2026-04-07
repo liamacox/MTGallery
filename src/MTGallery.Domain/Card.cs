@@ -25,7 +25,7 @@ public record Card(
             var imageUri = GetImageUri(cardJson);
             var set = cardJson.GetProperty("set").GetString()!;
             var scryfallId = cardJson.GetProperty("id").GetString()!;
-            var collectorNumber = cardJson.GetProperty("collector_number").GetInt32()!;
+            var collectorNumber = int.Parse(cardJson.GetProperty("collector_number").GetString()!);
             return new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri, collectorNumber);
         }
         catch (Exception)
