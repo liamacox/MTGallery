@@ -72,7 +72,7 @@ public class PostgreSqlRepository(
             {
                 var command = new NpgsqlBatchCommand();
                 command.CommandText = """
-                                      INSERT INTO set_data VALUES (@scryfall_id, @oracle_id, @set, @name, @rarity, @scryfall_uri, @image_uri);
+                                      INSERT INTO set_data VALUES (@scryfall_id, @oracle_id, @set, @name, @rarity, @scryfall_uri, @image_uri, @collector_number);
                                       """;
                 command.Parameters.AddWithValue("@scryfall_id", card.ScryfallId);
                 command.Parameters.AddWithValue("@oracle_id", card.OracleId);
@@ -81,6 +81,7 @@ public class PostgreSqlRepository(
                 command.Parameters.AddWithValue("@rarity", card.Rarity.ToString());
                 command.Parameters.AddWithValue("@scryfall_uri", card.ScryfallUri);
                 command.Parameters.AddWithValue("@image_uri", card.ImageUri);
+                command.Parameters.AddWithValue("@collector_number", card.CollectorNumber);
                 
                 batch.BatchCommands.Add(command);
             }
@@ -185,7 +186,8 @@ public class PostgreSqlRepository(
             var rarity = Enum.Parse<Rarity>(reader.GetString(4), ignoreCase: true);
             var scryfallUri = reader.GetString(5);
             var imageUri = reader.GetString(6);
-            setData.Add(new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri));
+            var collectorNumber = reader.GetInt32(7);
+            setData.Add(new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri, collectorNumber));
         }
 
         cache.Set($"{setCode}-set-data", setData);
@@ -211,8 +213,8 @@ public class PostgreSqlRepository(
         {
             var command = new NpgsqlBatchCommand();
             command.CommandText = """
-                                  INSERT INTO pulled_cards (scryfall_id, oracle_id, "set", name, rarity, scryfall_uri, image_uri, pull_count)
-                                  VALUES (@scryfall_id, @oracle_id, @set, @name, @rarity, @scryfall_uri, @image_uri, @pull_count)
+                                  INSERT INTO pulled_cards (scryfall_id, oracle_id, "set", name, rarity, scryfall_uri, image_uri, collector_number pull_count)
+                                  VALUES (@scryfall_id, @oracle_id, @set, @name, @rarity, @scryfall_uri, @image_uri, @collector_number, @pull_count)
                                   ON CONFLICT (scryfall_id)
                                   DO UPDATE SET pull_count = pulled_cards.pull_count + EXCLUDED.pull_count;
                                   """;
@@ -223,6 +225,7 @@ public class PostgreSqlRepository(
             command.Parameters.AddWithValue("@rarity", card.Rarity.ToString());
             command.Parameters.AddWithValue("@scryfall_uri", card.ScryfallUri);
             command.Parameters.AddWithValue("@image_uri", card.ImageUri);
+            command.Parameters.AddWithValue("@collector_number", card.CollectorNumber);
             command.Parameters.AddWithValue("@pull_count", count);
 
             batch.BatchCommands.Add(command);
@@ -281,8 +284,9 @@ public class PostgreSqlRepository(
             var rarity = Enum.Parse<Rarity>(reader.GetString(4), ignoreCase: true);
             var scryfallUri = reader.GetString(5);
             var imageUri = reader.GetString(6);
-            var count = reader.GetInt32(7);
-            cards.Add((new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri), count));
+            var collectorNumber = reader.GetInt32(7);
+            var count = reader.GetInt32(8);
+            cards.Add((new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri, collectorNumber), count));
         }
 
         return cards;
