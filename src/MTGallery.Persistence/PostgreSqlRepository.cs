@@ -55,7 +55,7 @@ public class PostgreSqlRepository(
                                       """;
         await truncateCommand.ExecuteNonQueryAsync();
 
-        foreach (var setCode in configuredSetsOptions.AllConfiguredSets.Append("spg"))
+        foreach (var setCode in configuredSetsOptions.AllConfiguredSets.Append(SpecialGuestSetCode))
         {
             var cards = await ScryfallApiClient.GetSetDataAsync(setCode);
             
