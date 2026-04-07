@@ -55,17 +55,9 @@ public class PostgreSqlRepository(
                                       """;
         await truncateCommand.ExecuteNonQueryAsync();
 
-        foreach (var setCode in configuredSetsOptions.AllConfiguredSets)
+        foreach (var setCode in configuredSetsOptions.AllConfiguredSets.Append("spg"))
         {
             var cards = await ScryfallApiClient.GetSetDataAsync(setCode);
-            if (configuredSetsOptions.SpecialGuestsEnabled &&
-                configuredSetsOptions.SpecialGuestRangesBySet.TryGetValue(setCode, out var ranges))
-            {
-                if (string.IsNullOrEmpty(ranges))
-                    throw new ArgumentException($"Failed to get special guest ranges for {setCode}!");
-                
-                cards.AddRange(await ScryfallApiClient.GetSpecialGuestDataAsync(ranges.Split(','), setCode));
-            }
             
             await using var batch = new NpgsqlBatch(connection);
             foreach (var card in cards)
