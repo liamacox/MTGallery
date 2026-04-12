@@ -53,6 +53,24 @@ MTGallery is a simple Magic: The Gathering pack generator and card repository. T
 * `SpecialGuestRangesBySet` - A dictionary with set codes as keys and special guest collector number ranges as values. For example, the special guest collector number range for Lorwyn Eclipsed (ecl) is \[129, 148\]. In order to generate special guest cards for a given set, it **must** be included in this dictionary.
 * `SpecialGuestRatesBySet` - A dictionary with set codes as keys and special guest pull rates in fraction form as values. For example, the special guest rate for Lorwyn Eclipsed (ecl) is 1 in 55 packs and 15 in 1000 packs for Bloomburrow (blb). In order to generate special guest cards for a given set, it **must** be included in this dictionary.
 
+### Example `ConfiguredSetsOptions` Configuration
+```json
+"ConfiguredSetsOptions": {
+        "ConfiguredSets": ["ecl", "blb"],
+        "ConfiguredCommanderSets": ["ecc", "blc"],
+        "HydrateSetData": false,
+        "SpecialGuestsEnabled": true,
+        "SpecialGuestRangesBySet": {
+            "ecl": "129,148",
+            "blb": "54,63"
+        },
+        "SpecialGuestRatesBySet": {
+            "ecl": "1,55",
+            "blb": "15,1000"
+        }
+    }
+```
+
 # Notice
 Portions of MTGallery are unofficial Fan Content permitted under the Wizards of the Coast Fan Content Policy. The literal and graphical information presented in this program about Magic: The Gathering, including card images, is copyright Wizards of the Coast, LLC. MTGallery is not produced by or endorsed by Wizards of the Coast.
 
