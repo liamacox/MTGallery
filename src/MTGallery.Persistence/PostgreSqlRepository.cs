@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Frozen;
+using System.Text.Json;
 using Microsoft.Extensions.Caching.Memory;
 using MTGallery.Configuration;
 using MTGallery.Domain;
@@ -151,14 +152,16 @@ public class PostgreSqlRepository(
         return (pullRates is not null, pullRates ?? []);
     }
 
-    public async Task<HashSet<Card>> GetCardsForSetAsync(string setCode)
+    public async Task<FrozenSet<Card>> GetCardsForSetAsync(string setCode)
     {
         if (!configuredSetsOptions.AllConfiguredSets.Contains(setCode) 
              && (setCode == SpecialGuestSetCode && !configuredSetsOptions.SpecialGuestsEnabled))
             throw new ArgumentException($"{setCode} is not a configured set!");
 
-        var (success, setData) = GetSetDataFromCache(setCode);
-        if (success) return setData;
+        var (success, cachedSetData) = GetSetDataFromCache(setCode);
+        if (success) return cachedSetData;
+
+        HashSet<Card> setData = [];
         
         await using var dataSource = NpgsqlDataSource.Create(_connectionString);
         
@@ -183,12 +186,13 @@ public class PostgreSqlRepository(
             setData.Add(new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri, collectorNumber));
         }
 
-        cache.Set($"{setCode}-set-data", setData);
-        return setData;
+        var frozenSetData = setData.ToFrozenSet();
+        cache.Set($"{setCode}-set-data", frozenSetData);
+        return frozenSetData;
     }
 
     private const string SpecialGuestSetCode = "spg";
-    public async Task<HashSet<Card>> GetSpecialGuestCardsInRangeAsync(int lowerBound, int upperBound)
+    public async Task<IEnumerable<Card>> GetSpecialGuestCardsInRangeAsync(int lowerBound, int upperBound)
     {
         if (!configuredSetsOptions.SpecialGuestsEnabled)
             throw new ArgumentException("Special guests are not enabled!!!");
@@ -201,19 +205,18 @@ public class PostgreSqlRepository(
             cache.Set($"{SpecialGuestSetCode}-set-data", setData);
         }
         
-        return setData.Where(card => card.CollectorNumber >= lowerBound && card.CollectorNumber <= upperBound)
-                      .ToHashSet();
+        return setData.Where(card => card.CollectorNumber >= lowerBound && card.CollectorNumber <= upperBound);
     }
     
-    private (bool success, HashSet<Card> setData) GetSetDataFromCache(string setCode)
+    private (bool success, FrozenSet<Card> setData) GetSetDataFromCache(string setCode)
     {
-        if (!cache.TryGetValue($"{setCode}-set-data", out HashSet<Card>? setData)) 
+        if (!cache.TryGetValue($"{setCode}-set-data", out FrozenSet<Card>? setData)) 
             return (false,[]);
         
         return (setData is not null, setData ?? []);
     }
 
-    public async Task UpsertPulledCardsAsync(Dictionary<Card, int> pulledCards)
+    public async Task UpsertPulledCardsAsync(FrozenDictionary<Card, int> pulledCards)
     {
         await using var dataSource = NpgsqlDataSource.Create(_connectionString);
         await using var connection = await dataSource.OpenConnectionAsync();
@@ -244,7 +247,7 @@ public class PostgreSqlRepository(
         await batch.ExecuteNonQueryAsync();
     }
     
-    public async Task UpsertCommanderCardsAsync(HashSet<Card> commanderCards)
+    public async Task UpsertCommanderCardsAsync(FrozenSet<Card> commanderCards)
     {
         await using var dataSource = NpgsqlDataSource.Create(_connectionString);
         await using var connection = await dataSource.OpenConnectionAsync();
@@ -274,7 +277,7 @@ public class PostgreSqlRepository(
         await batch.ExecuteNonQueryAsync();
     }
 
-    public async Task<List<(Card card, int count)>> GetPulledCardsAsync()
+    public async Task<FrozenSet<(Card card, int count)>> GetPulledCardsAsync()
     {
         await using var dataSource = NpgsqlDataSource.Create(_connectionString);
         
@@ -300,7 +303,7 @@ public class PostgreSqlRepository(
             cards.Add((new Card(name, rarity, scryfallId, set, oracleId, scryfallUri, imageUri, collectorNumber), count));
         }
 
-        return cards;
+        return cards.ToFrozenSet();
     }
 
     public async Task TruncatePulledCardsTable()

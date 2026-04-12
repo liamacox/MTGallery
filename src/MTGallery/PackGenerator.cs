@@ -88,7 +88,7 @@ public class PackGenerator(PostgreSqlRepository repository, ConfiguredSetsOption
         return rarities.ToList();
     }
 
-    private async Task<HashSet<Card>> GetSpecialGuestCardsAsync(string setCode)
+    private async Task<IEnumerable<Card>> GetSpecialGuestCardsAsync(string setCode)
     {
         var generateSpgCards = configuredSetsOptions.SpecialGuestsEnabled 
                                && configuredSetsOptions.SpecialGuestRangesBySet.ContainsKey(setCode)
