@@ -8,7 +8,7 @@ namespace MTGallery;
 public class PackGenerator(PostgreSqlRepository repository, ConfiguredSetsOptions configuredSetsOptions)
 {
     private const int SpecialGuestPull = 7;
-    public async Task<Dictionary<Card, int>> GeneratePacks(string setCode, int numberOfPacks = 1)
+    public async Task<FrozenDictionary<Card, int>> GeneratePacks(string setCode, int numberOfPacks = 1)
     {
         if (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
             throw new ArgumentException($"{setCode} is not a configured set!");
@@ -39,7 +39,7 @@ public class PackGenerator(PostgreSqlRepository repository, ConfiguredSetsOption
             }
         }
 
-        return pulledCards;
+        return pulledCards.ToFrozenDictionary();
     }
 
     private const string SpecialGuestSetCode = "spg";
