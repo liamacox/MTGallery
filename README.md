@@ -1,5 +1,5 @@
 # About
-MTGallery is a simple Magic: The Gathering pack generator as I cannot afford to rip packs in the real world. This generator supports any set that can be found on [Scryfall](https://scryfall.com/) and generates a simple HTML report that can be easily shared with others.  
+MTGallery is a simple Magic: The Gathering pack generator and card repository. The generator supports any set that can be found on [Scryfall](https://scryfall.com/) and generates a simple HTML report that can be easily shared with others.  
 
 # Dependencies
 * PostgreSQL
