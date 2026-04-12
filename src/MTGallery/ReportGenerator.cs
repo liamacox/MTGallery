@@ -1,12 +1,15 @@
 ﻿using MTGallery.Configuration;
-using MTGallery.Domain;
+using MTGallery.Persistence;
 
 namespace MTGallery;
 
-public class ReportGenerator(ConfiguredSetsOptions configuredSetsOptions, OutputOptions outputOptions)
+public class ReportGenerator(PostgreSqlRepository repository, 
+    ConfiguredSetsOptions configuredSetsOptions, 
+    OutputOptions outputOptions)
 {
-    public async Task WriteHtmlReportAsync(Task<List<(Card, int)>> cards)
+    public async Task WriteHtmlReportAsync()
     {
+        var cards = repository.GetPulledCardsAsync();
         Console.WriteLine("Generating report...");
         await File.WriteAllTextAsync(outputOptions.OutputPath, string.Empty);
         await File.AppendAllTextAsync(outputOptions.OutputPath, """

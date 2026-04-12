@@ -20,10 +20,10 @@ var configuredSetsOptions = configuration.GetSection(nameof(ConfiguredSetsOption
 
 /* ---------------------------------------- DI ---------------------------------------- */
 
-var reportGenerator = new ReportGenerator(configuredSetsOptions, outputOptions);
 var cache =  new MemoryCache(new MemoryCacheOptions());
 var postgreSqlRepository = new PostgreSqlRepository(cache, databaseOptions, configuredSetsOptions);
 var initializeTask = postgreSqlRepository.InitializeAsync();
+var reportGenerator = new ReportGenerator(postgreSqlRepository, configuredSetsOptions, outputOptions);
 var packGenerator = new PackGenerator(postgreSqlRepository, configuredSetsOptions);
 await initializeTask;
 
@@ -44,7 +44,7 @@ while (input is not "q")
     else if (input is "T") await TruncateDataBaseInteractiveAsync();
     else if (input is "q" or "3")
     {
-        await reportGenerator.WriteHtmlReportAsync(postgreSqlRepository.GetPulledCardsAsync());
+        await reportGenerator.WriteHtmlReportAsync();
     }
     else Console.WriteLine("Invalid input.");
 }
