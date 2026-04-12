@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Collections.Frozen;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using MTGallery.Domain;
 
@@ -6,7 +7,7 @@ namespace MTGallery.Persistence;
 
 public static class ScryfallApiClient
 {
-    public static async Task<List<Card>> GetSetDataAsync(string setCode)
+    public static async Task<FrozenSet<Card>> GetSetDataAsync(string setCode)
     {
         List<Card> cards = [];
         
@@ -36,6 +37,6 @@ public static class ScryfallApiClient
             }
         } while (responseJson.RootElement.GetProperty("has_more").GetBoolean());
         
-        return cards;
+        return cards.ToFrozenSet();
     }
 }
