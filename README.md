@@ -56,19 +56,19 @@ MTGallery is a simple Magic: The Gathering pack generator and card repository. T
 ### Example `ConfiguredSetsOptions` Configuration
 ```json
 "ConfiguredSetsOptions": {
-        "ConfiguredSets": ["ecl", "blb"],
-        "ConfiguredCommanderSets": ["ecc", "blc"],
-        "HydrateSetData": false,
-        "SpecialGuestsEnabled": true,
-        "SpecialGuestRangesBySet": {
-            "ecl": "129,148",
-            "blb": "54,63"
-        },
-        "SpecialGuestRatesBySet": {
-            "ecl": "1,55",
-            "blb": "15,1000"
-        }
+    "ConfiguredSets": ["ecl", "blb"],
+    "ConfiguredCommanderSets": ["ecc", "blc"],
+    "HydrateSetData": false,
+    "SpecialGuestsEnabled": true,
+    "SpecialGuestRangesBySet": {
+        "ecl": "129,148",
+        "blb": "54,63"
+    },
+    "SpecialGuestRatesBySet": {
+        "ecl": "1,55",
+        "blb": "15,1000"
     }
+}
 ```
 
 # Notice
