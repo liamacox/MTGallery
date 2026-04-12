@@ -47,7 +47,7 @@ MTGallery is a simple Magic: The Gathering pack generator and card repository. T
 
 ## Configured Sets Options
 * `ConfiguredSets` - List of **non-commander** sets you want to be able to draw from.
-* `ConfiguredCommanderSets` - List of **commander** sets you want to be able to load into your card pool. The program does not "draw" from commander sets. It instead adds one of each card into your pool of pulled cards, as if you bought one of each commander precon for the set.
+* `ConfiguredCommanderSets` - List of **commander** sets you want to be able to load into your card pool. The program does not "draw" from commander sets. It instead adds one of each card into your pool of pulled cards, as if you had purchased one of each commander precon for the set.
 * `HydrateSetData` - Set to `true` to populate the `set_data` table with the cards from each configured set. Keep this option set to `false` at all times unless you made changes to the `ConfiguredSetsOptions` as querying Scryfall significantly increases start up time. 
 * `SpecialGuestsEnabled` - Set to `true` to enable adding special guest cards (setcode SPG) to packs if possible. Set to `false` to disable this functionality. 
 * `SpecialGuestRangesBySet` - A dictionary with set codes as keys and special guest collector number ranges as values. For example, the special guest collector number range for Lorwyn Eclipsed (ecl) is \[129, 148\]. In order to generate special guest cards for a given set, it **must** be included in this dictionary.
