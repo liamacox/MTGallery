@@ -22,7 +22,7 @@ var configuredSetsOptions = configuration.GetSection(nameof(ConfiguredSetsOption
 /* ---------------------------------------- DI ---------------------------------------- */
 
 var cache =  new MemoryCache(new MemoryCacheOptions());
-var postgreSqlRepository = new PostgreSqlRepository(cache, databaseOptions, configuredSetsOptions);
+var postgreSqlRepository = new PostgreSqlRepository(cache, databaseOptions);
 var initializeTask = postgreSqlRepository.InitializeAsync();
 var reportGenerator = new ReportGenerator(postgreSqlRepository, configuredSetsOptions, outputOptions);
 var packGenerator = new PackGenerationCoordinator(postgreSqlRepository, configuredSetsOptions);
@@ -72,7 +72,7 @@ async Task LoadCommanderSetAsync()
 async Task GeneratePacksInteractiveAsync()
 {
     var setCode = string.Empty;
-    while (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
+    while (!packGenerator.PullableSets.Contains(setCode))
     {
         Console.WriteLine("Enter a configured set code (or enter c to cancel):");
         setCode = Console.ReadLine() ?? string.Empty;

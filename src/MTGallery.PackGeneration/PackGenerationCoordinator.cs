@@ -25,6 +25,8 @@ public class PackGenerationCoordinator(PostgreSqlRepository repository, Configur
             repository)},
     }.ToFrozenDictionary();
     
+    public IReadOnlyCollection<string> PullableSets => _packGenerators.Keys;
+    
     public Task<FrozenDictionary<Card, int>> GeneratePacksAsync(string setCode, int numberOfPacks = 1)
     {
         if (!_packGenerators.ContainsKey(setCode))
