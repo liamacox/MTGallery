@@ -9,7 +9,13 @@ public class PackGenerationCoordinator(PostgreSqlRepository repository, Configur
 {
     private readonly FrozenDictionary<string, IPackGenerator> _packGenerators = new Dictionary<string, IPackGenerator>()
     {
-        {"blb", new BlbPackGenerator(repository, configuredSetsOptions)},
+        {"blb", new DefaultPackGenerator(
+            "blb", 
+            15,
+            1000,
+            54,
+            63,
+            repository)},
     }.ToFrozenDictionary();
     
     public Task<FrozenDictionary<Card, int>> GeneratePacksAsync(string setCode, int numberOfPacks = 1)

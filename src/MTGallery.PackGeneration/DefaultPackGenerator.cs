@@ -5,19 +5,20 @@ using MTGallery.Persistence;
 
 namespace MTGallery.PackGeneration;
 
-internal class BlbPackGenerator(PostgreSqlRepository repository, ConfiguredSetsOptions configuredSetsOptions) : IPackGenerator
+internal class DefaultPackGenerator(string setCode, 
+    int specialGuestRateNumerator, 
+    int specialGuestRateDenominator,
+    int specialGuestCollectorNumberLowerBound,
+    int specialGuestCollectorNumberUpperBound,
+    PostgreSqlRepository repository) : IPackGenerator
 {
     private const int SpecialGuestPull = 7;
-    private const string SetCode = "blb";
     private const string SpecialGuestSetCode = "spg";
     
     public async Task<FrozenDictionary<Card, int>> GeneratePacksAsync(int numberOfPacks = 1)
     {
-        if (!configuredSetsOptions.ConfiguredSets.Contains(SetCode))
-            throw new ArgumentException($"{SetCode} is not a configured set!");
-
-        var pullRatesTask = repository.GetPullRatesForSetAsync(SetCode);
-        var setCardsTask = repository.GetCardsForSetAsync(SetCode);
+        var pullRatesTask = repository.GetPullRatesForSetAsync(setCode);
+        var setCardsTask = repository.GetCardsForSetAsync(setCode);
         var specialGuestCardsTask = GetSpecialGuestCardsAsync();
         
         Dictionary<Card, int> pulledCards = [];
@@ -53,21 +54,15 @@ internal class BlbPackGenerator(PostgreSqlRepository repository, ConfiguredSetsO
         var draws = GenerateRaritiesList(rates);
         var rarity = draws.ElementAt(Random.Shared.Next(0, draws.Count));
         
-        return allAvailableCards.Where(card => card.Rarity == rarity && card.Set == SetCode).ToArray();
+        return allAvailableCards.Where(card => card.Rarity == rarity && card.Set == setCode).ToArray();
     }
     
     private bool IsSpecialGuestCard(int cardNumber)
     {
-        if (!configuredSetsOptions.SpecialGuestsEnabled || cardNumber is not SpecialGuestPull) return false;
-        
-        var spgRates = configuredSetsOptions.SpecialGuestRatesBySet[SetCode].Split(',');
-        var numerator = int.Parse(spgRates[0]);
-        var denominator = int.Parse(spgRates[1]);
-        
         Rarity[] chances = 
         [
-            .. Enumerable.Repeat(Rarity.SpecialGuest, numerator),
-            .. Enumerable.Repeat(Rarity.Common, denominator - numerator),
+            .. Enumerable.Repeat(Rarity.SpecialGuest, specialGuestRateNumerator),
+            .. Enumerable.Repeat(Rarity.Common, specialGuestRateDenominator - specialGuestRateNumerator),
         ];
         
         Random.Shared.Shuffle(chances);
@@ -91,19 +86,5 @@ internal class BlbPackGenerator(PostgreSqlRepository repository, ConfiguredSetsO
     }
 
     private async Task<IEnumerable<Card>> GetSpecialGuestCardsAsync()
-    {
-        var generateSpgCards = configuredSetsOptions.SpecialGuestsEnabled 
-                               && configuredSetsOptions.SpecialGuestRangesBySet.ContainsKey(SetCode)
-                               && configuredSetsOptions.SpecialGuestRatesBySet.ContainsKey(SetCode);
-
-        if (!generateSpgCards) return [];
-
-        var range = configuredSetsOptions.SpecialGuestRangesBySet[SetCode].Split(',');
-        var lowerBound = int.Parse(range[0]);
-        var upperBound = int.Parse(range[1]);
-
-        var specialGuestCards = await repository.GetSpecialGuestCardsInRangeAsync(lowerBound, upperBound);
-
-        return specialGuestCards;
-    }
+        => await repository.GetSpecialGuestCardsInRangeAsync(specialGuestCollectorNumberLowerBound, specialGuestCollectorNumberUpperBound);
 }
