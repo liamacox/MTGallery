@@ -7,8 +7,10 @@ namespace MTGallery.PackGeneration;
 
 public class PackGenerationCoordinator(PostgreSqlRepository repository, ConfiguredSetsOptions configuredSetsOptions)
 {
-    private static readonly FrozenDictionary<string, IPackGenerator> _packGenerators = 
-        new Dictionary<string, IPackGenerator>().ToFrozenDictionary();
+    private readonly FrozenDictionary<string, IPackGenerator> _packGenerators = new Dictionary<string, IPackGenerator>()
+    {
+        {"blb", new BlbPackGenerator(repository, configuredSetsOptions)},
+    }.ToFrozenDictionary();
     
     public Task<FrozenDictionary<Card, int>> GeneratePacksAsync(string setCode, int numberOfPacks = 1)
     {
