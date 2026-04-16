@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using MTGallery;
 using MTGallery.Configuration;
+using MTGallery.PackGeneration;
 using MTGallery.Persistence;
 
 /* ---------------------------------------- CONFIGURATION ---------------------------------------- */
@@ -24,7 +25,7 @@ var cache =  new MemoryCache(new MemoryCacheOptions());
 var postgreSqlRepository = new PostgreSqlRepository(cache, databaseOptions, configuredSetsOptions);
 var initializeTask = postgreSqlRepository.InitializeAsync();
 var reportGenerator = new ReportGenerator(postgreSqlRepository, configuredSetsOptions, outputOptions);
-var packGenerator = new PackGenerator(postgreSqlRepository, configuredSetsOptions);
+var packGenerator = new PackGenerationCoordinator(postgreSqlRepository, configuredSetsOptions);
 await initializeTask;
 
 /* ---------------------------------------- User Interface ---------------------------------------- */
@@ -84,7 +85,7 @@ async Task GeneratePacksInteractiveAsync()
     {
         Console.WriteLine("Please enter a valid natural number!");
     }
-    var pulledCards = await packGenerator.GeneratePacks(setCode, numberOfPacks);
+    var pulledCards = await packGenerator.GeneratePacksAsync(setCode, numberOfPacks);
     var upsertTask = postgreSqlRepository.UpsertPulledCardsAsync(pulledCards);
     Console.WriteLine("Pulled the following cards:");
     foreach (var (card, count) in pulledCards)

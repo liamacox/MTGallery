@@ -10,6 +10,7 @@
     <ItemGroup>
       <ProjectReference Include="..\MTGallery.Configuration\MTGallery.Configuration.csproj" />
       <ProjectReference Include="..\MTGallery.Domain\MTGallery.Domain.csproj" />
+      <ProjectReference Include="..\MTGallery.PackGeneration\MTGallery.PackGeneration.csproj" />
       <ProjectReference Include="..\MTGallery.Persistence\MTGallery.Persistence.csproj" />
     </ItemGroup>
 
