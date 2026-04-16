@@ -16,6 +16,13 @@ public class PackGenerationCoordinator(PostgreSqlRepository repository, Configur
             54,
             63,
             repository)},
+        {"ecl", new DefaultPackGenerator(
+            "ecl", 
+            1,
+            55,
+            129,
+            148,
+            repository)},
     }.ToFrozenDictionary();
     
     public Task<FrozenDictionary<Card, int>> GeneratePacksAsync(string setCode, int numberOfPacks = 1)
