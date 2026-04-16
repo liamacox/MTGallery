@@ -5,7 +5,7 @@ using MTGallery.Persistence;
 
 namespace MTGallery.PackGeneration;
 
-public class BlbPackGenerator(PostgreSqlRepository repository, ConfiguredSetsOptions configuredSetsOptions) : IPackGenerator
+internal class BlbPackGenerator(PostgreSqlRepository repository, ConfiguredSetsOptions configuredSetsOptions) : IPackGenerator
 {
     private const int SpecialGuestPull = 7;
     private const string SetCode = "blb";
