@@ -1,11 +1,10 @@
 ﻿using System.Collections.Frozen;
-using MTGallery.Configuration;
 using MTGallery.Domain;
 using MTGallery.Persistence;
 
 namespace MTGallery.PackGeneration;
 
-public class PackGenerationCoordinator(PostgreSqlRepository repository, ConfiguredSetsOptions configuredSetsOptions)
+public class PackGenerationCoordinator(PostgreSqlRepository repository)
 {
     private readonly FrozenDictionary<string, IPackGenerator> _packGenerators = new Dictionary<string, IPackGenerator>()
     {
@@ -31,11 +30,11 @@ public class PackGenerationCoordinator(PostgreSqlRepository repository, Configur
     
     public Task<FrozenDictionary<Card, int>> GeneratePacksAsync(string setCode, int numberOfPacks = 1)
     {
-        if (!_packGenerators.ContainsKey(key: setCode))
+        if (!_packGenerators.ContainsKey(setCode))
             throw new ArgumentException(message: $"{setCode} is not a configured set!");
         if (numberOfPacks < 1)
             throw new ArgumentException(message: "Invalid number of packs!");
 
-        return _packGenerators[key: setCode].GeneratePacksAsync(numberOfPacks: numberOfPacks);
+        return _packGenerators[setCode].GeneratePacksAsync(numberOfPacks);
     }
 }
