@@ -7,21 +7,22 @@ using MTGallery.Persistence;
 
 /* ---------------------------------------- CONFIGURATION ---------------------------------------- */
 
-var configurationBuilder = new ConfigurationBuilder().AddJsonFile(@"C:\Users\Liam Cox\git\MTGallery\appsettings.json", optional: false);
-var configuration =  configurationBuilder.Build();
+var configurationBuilder =
+    new ConfigurationBuilder().AddJsonFile(@"C:\Users\Liam Cox\git\MTGallery\appsettings.json", false);
+var configuration = configurationBuilder.Build();
 
-var outputOptions = configuration.GetSection(nameof(OutputOptions)).Get<OutputOptions>() 
+var outputOptions = configuration.GetSection(nameof(OutputOptions)).Get<OutputOptions>()
                     ?? throw new NullReferenceException("Failed to load configuration!");
 
-var databaseOptions = configuration.GetSection(nameof(DatabaseConfigurationOptions)).Get<DatabaseConfigurationOptions>() 
-                      ?? throw new  NullReferenceException("Failed to load configuration!");
+var databaseOptions = configuration.GetSection(nameof(DatabaseConfigurationOptions)).Get<DatabaseConfigurationOptions>()
+                      ?? throw new NullReferenceException("Failed to load configuration!");
 
-var configuredSetsOptions = configuration.GetSection(nameof(ConfiguredSetsOptions)).Get<ConfiguredSetsOptions>() 
+var configuredSetsOptions = configuration.GetSection(nameof(ConfiguredSetsOptions)).Get<ConfiguredSetsOptions>()
                             ?? throw new NullReferenceException("Failed to load configuration!");
 
 /* ---------------------------------------- DI ---------------------------------------- */
 
-var cache =  new MemoryCache(new MemoryCacheOptions());
+var cache = new MemoryCache(new MemoryCacheOptions());
 var postgreSqlRepository = new PostgreSqlRepository(cache, databaseOptions);
 var initializeTask = postgreSqlRepository.InitializeAsync();
 var reportGenerator = new ReportGenerator(postgreSqlRepository, configuredSetsOptions, outputOptions);
@@ -43,15 +44,12 @@ while (input is not "q")
     if (input is "1") await GeneratePacksInteractiveAsync();
     else if (input is "2") await LoadCommanderSetAsync();
     else if (input is "T") await TruncateDataBaseInteractiveAsync();
-    else if (input is "q" or "3")
-    {
-        await reportGenerator.WriteHtmlReportAsync();
-    }
+    else if (input is "q" or "3") await reportGenerator.WriteHtmlReportAsync();
     else Console.WriteLine("Invalid input.");
 }
 
 Console.WriteLine("Exiting...");
-return; 
+return;
 
 /* ---------------------------------------- User Interface Helper Functions ---------------------------------------- */
 
@@ -78,20 +76,18 @@ async Task GeneratePacksInteractiveAsync()
         setCode = Console.ReadLine() ?? string.Empty;
         if (setCode is "c") return;
     }
-    
+
     Console.WriteLine("How many packs would you like to generate?");
+    
     var numberOfPacks = 0;
     while (!int.TryParse(Console.ReadLine(), out numberOfPacks))
-    {
         Console.WriteLine("Please enter a valid natural number!");
-    }
+    
     var pulledCards = await packGenerator.GeneratePacksAsync(setCode, numberOfPacks);
     var upsertTask = postgreSqlRepository.UpsertPulledCardsAsync(pulledCards);
+    
     Console.WriteLine("Pulled the following cards:");
-    foreach (var (card, count) in pulledCards)
-    {
-        Console.WriteLine($"{count} {card.Name}");
-    }
+    foreach (var (card, count) in pulledCards) Console.WriteLine($"{count} {card.Name}");
 
     await upsertTask;
 }
