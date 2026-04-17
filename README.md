@@ -1,9 +1,16 @@
 # About
 MTGallery is a simple Magic: The Gathering pack generator and card repository. The generator supports any set that can be found on [Scryfall](https://scryfall.com/) and generates a simple HTML report that can be easily shared with others.  
 
+## Supported Sets
+This generator supports creating packs for the following sets:
+* Bloomburrow (blb)
+* Lorwyn Eclipsed (ecl)
+
+Commander sets can be configured as shown in the below configuration section.
+
 # Dependencies
 * PostgreSQL
-  * The program takes care of creating all of the necessary tables, however you must manually insert the JSON pull rates you want to use into the `pull_rates` table. This can be accomplished using the SQL command `INSERT INTO pull_rates VALUES (<set_code>, <json_data>);`. Some sample pull rates data can be found in [SetData](SetData).
+  * The program takes care of creating all of the necessary tables.
 * If you want to use this program, you must also change the configuration source file path in [src/MTGallery/Program.cs](src/MTGallery/Program.cs) on line #9.
 * See the below section for creating your JSON configuration file.
 
@@ -22,16 +29,7 @@ MTGallery is a simple Magic: The Gathering pack generator and card repository. T
         "Database": "<Database name>"
     },
     "ConfiguredSetsOptions": {
-        "ConfiguredSets": [<"comma", "seperated", "list", "of", "standard", "setcodes">],
         "ConfiguredCommanderSets": [<"comma", "seperated", "list", "of", "commander", "setcodes">],   
-        "HydrateSetData": <true/false>,
-        "SpecialGuestsEnabled": <true/false>,
-        "SpecialGuestRangesBySet": {
-            "<setCode>": "<lower-bound-collector-number>,<upper-bound-collector-number>" 
-        },
-        "SpecialGuestRatesBySet": {
-            "<setCode>": "<numerator>,<denominator>"
-        }
     }
 }
 ```
@@ -46,28 +44,12 @@ MTGallery is a simple Magic: The Gathering pack generator and card repository. T
 * `Database` - Name of the desired database. 
 
 ## Configured Sets Options
-* `ConfiguredSets` - List of **non-commander** sets you want to be able to draw from.
 * `ConfiguredCommanderSets` - List of **commander** sets you want to be able to load into your card pool. The program does not "draw" from commander sets. It instead adds one of each card into your pool of pulled cards, as if you had purchased one of each commander precon for the set.
-* `HydrateSetData` - Set to `true` to populate the `set_data` table with the cards from each configured set. Keep this option set to `false` at all times unless you made changes to the `ConfiguredSetsOptions` as querying Scryfall and updating the database significantly increases start up time. 
-* `SpecialGuestsEnabled` - Set to `true` to enable adding special guest cards (SPG) to packs if possible. Set to `false` to disable this functionality. 
-* `SpecialGuestRangesBySet` - A dictionary with set codes as keys and special guest collector number ranges as values. For example, the special guest collector number range for Lorwyn Eclipsed (ecl) is \[129, 148\]. In order to generate special guest cards for a given set, it **must** be included in this dictionary.
-* `SpecialGuestRatesBySet` - A dictionary with set codes as keys and special guest pull rates in fraction form as values. For example, the special guest rate for Lorwyn Eclipsed (ecl) is 1 in 55 packs and 15 in 1000 packs for Bloomburrow (blb). In order to generate special guest cards for a given set, it **must** be included in this dictionary.
 
 ### Example `ConfiguredSetsOptions` Configuration
 ```json
 "ConfiguredSetsOptions": {
-    "ConfiguredSets": ["ecl", "blb"],
     "ConfiguredCommanderSets": ["ecc", "blc"],
-    "HydrateSetData": false,
-    "SpecialGuestsEnabled": true,
-    "SpecialGuestRangesBySet": {
-        "ecl": "129,148",
-        "blb": "54,63"
-    },
-    "SpecialGuestRatesBySet": {
-        "ecl": "1,55",
-        "blb": "15,1000"
-    }
 }
 ```
 
