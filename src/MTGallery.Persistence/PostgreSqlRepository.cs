@@ -196,8 +196,8 @@ public class PostgreSqlRepository(
         {
             var command = new NpgsqlBatchCommand();
             command.CommandText = """
-                                  INSERT INTO pulled_cards (scryfall_id, oracle_id, "set", name, rarity, scryfall_uri, image_uri, pull_count)
-                                  VALUES (@scryfall_id, @oracle_id, @set, @name, @rarity, @scryfall_uri, @image_uri, @pull_count)
+                                  INSERT INTO pulled_cards (scryfall_id, oracle_id, "set", name, rarity, scryfall_uri, image_uri, collector_number, pull_count)
+                                  VALUES (@scryfall_id, @oracle_id, @set, @name, @rarity, @scryfall_uri, @image_uri, @collector_number, @pull_count)
                                   ON CONFLICT (scryfall_id)
                                   DO NOTHING;
                                   """;
@@ -208,6 +208,7 @@ public class PostgreSqlRepository(
             command.Parameters.AddWithValue("@rarity", card.Rarity.ToString());
             command.Parameters.AddWithValue("@scryfall_uri", card.ScryfallUri);
             command.Parameters.AddWithValue("@image_uri", card.ImageUri);
+            command.Parameters.AddWithValue("@collector_number", card.CollectorNumber);
             command.Parameters.AddWithValue("@pull_count", 1);
 
             batch.BatchCommands.Add(command);
