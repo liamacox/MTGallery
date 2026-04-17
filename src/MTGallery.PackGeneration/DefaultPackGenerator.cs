@@ -57,6 +57,7 @@ internal class DefaultPackGenerator(string setCode,
     
     private bool IsSpecialGuestCard(int cardNumber)
     {
+        if (cardNumber != SpecialGuestPull) return false;
         Rarity[] chances = 
         [
             .. Enumerable.Repeat(Rarity.SpecialGuest, specialGuestRateNumerator),
