@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using MTGallery;
 
 namespace MTGallery.Domain.UnitTests;
 
