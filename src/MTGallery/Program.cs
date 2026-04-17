@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using MTGallery;
 using MTGallery.Configuration;
+using MTGallery.PackGeneration;
 using MTGallery.Persistence;
 
 /* ---------------------------------------- CONFIGURATION ---------------------------------------- */
@@ -21,10 +22,10 @@ var configuredSetsOptions = configuration.GetSection(nameof(ConfiguredSetsOption
 /* ---------------------------------------- DI ---------------------------------------- */
 
 var cache =  new MemoryCache(new MemoryCacheOptions());
-var postgreSqlRepository = new PostgreSqlRepository(cache, databaseOptions, configuredSetsOptions);
+var postgreSqlRepository = new PostgreSqlRepository(cache, databaseOptions);
 var initializeTask = postgreSqlRepository.InitializeAsync();
 var reportGenerator = new ReportGenerator(postgreSqlRepository, configuredSetsOptions, outputOptions);
-var packGenerator = new PackGenerator(postgreSqlRepository, configuredSetsOptions);
+var packGenerator = new PackGenerationCoordinator(postgreSqlRepository);
 await initializeTask;
 
 /* ---------------------------------------- User Interface ---------------------------------------- */
@@ -71,7 +72,7 @@ async Task LoadCommanderSetAsync()
 async Task GeneratePacksInteractiveAsync()
 {
     var setCode = string.Empty;
-    while (!configuredSetsOptions.ConfiguredSets.Contains(setCode))
+    while (!packGenerator.PullableSets.Contains(setCode))
     {
         Console.WriteLine("Enter a configured set code (or enter c to cancel):");
         setCode = Console.ReadLine() ?? string.Empty;
@@ -84,7 +85,7 @@ async Task GeneratePacksInteractiveAsync()
     {
         Console.WriteLine("Please enter a valid natural number!");
     }
-    var pulledCards = await packGenerator.GeneratePacks(setCode, numberOfPacks);
+    var pulledCards = await packGenerator.GeneratePacksAsync(setCode, numberOfPacks);
     var upsertTask = postgreSqlRepository.UpsertPulledCardsAsync(pulledCards);
     Console.WriteLine("Pulled the following cards:");
     foreach (var (card, count) in pulledCards)

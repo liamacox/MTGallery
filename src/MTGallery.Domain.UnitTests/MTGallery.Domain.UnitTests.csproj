@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MTGallery\MTGallery.csproj" />
+      <ProjectReference Include="..\MTGallery.Domain\MTGallery.Domain.csproj" />
     </ItemGroup>
 
 </Project>

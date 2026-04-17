@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTGallery.Configuration", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTGallery.Domain", "src\MTGallery.Domain\MTGallery.Domain.csproj", "{CF350153-0C11-41EF-B6BC-603A2480ECE5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MTGallery.PackGeneration", "src\MTGallery.PackGeneration\MTGallery.PackGeneration.csproj", "{14AF4A9D-6ADB-4D92-9973-BF8E9B2B2123}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{CF350153-0C11-41EF-B6BC-603A2480ECE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF350153-0C11-41EF-B6BC-603A2480ECE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF350153-0C11-41EF-B6BC-603A2480ECE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14AF4A9D-6ADB-4D92-9973-BF8E9B2B2123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14AF4A9D-6ADB-4D92-9973-BF8E9B2B2123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14AF4A9D-6ADB-4D92-9973-BF8E9B2B2123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14AF4A9D-6ADB-4D92-9973-BF8E9B2B2123}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
