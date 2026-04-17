@@ -3,8 +3,9 @@ using MTGallery.Persistence;
 
 namespace MTGallery;
 
-public class ReportGenerator(PostgreSqlRepository repository, 
-    ConfiguredSetsOptions configuredSetsOptions, 
+public class ReportGenerator(
+    PostgreSqlRepository repository,
+    ConfiguredSetsOptions configuredSetsOptions,
     OutputOptions outputOptions)
 {
     public async Task WriteHtmlReportAsync()
@@ -13,29 +14,28 @@ public class ReportGenerator(PostgreSqlRepository repository,
         Console.WriteLine("Generating report...");
         await File.WriteAllTextAsync(outputOptions.OutputPath, string.Empty);
         await File.AppendAllTextAsync(outputOptions.OutputPath, """
-                                                     <!DOCTYPE html>
-                                                     <html>
-                                                     <head>
-                                                     <title>Cards</title>
-                                                     </head>
-                                                     <body>
-                                                     <button id="toggle-commander-only">Hide commander-only cards</button>
-                                                     <table id="cards">
-                                                     <thead>
-                                                     <tr>
-                                                     <th>Card</th>
-                                                     <th>Name</th>
-                                                     <th>Set</th>
-                                                     <th>Rarity</th>
-                                                     <th>Count</th>
-                                                     <th>Commander</th>
-                                                     </tr>
-                                                     </thead>
-                                                     <tbody>
-                                                     """);
+                                                                <!DOCTYPE html>
+                                                                <html>
+                                                                <head>
+                                                                <title>Cards</title>
+                                                                </head>
+                                                                <body>
+                                                                <button id="toggle-commander-only">Hide commander-only cards</button>
+                                                                <table id="cards">
+                                                                <thead>
+                                                                <tr>
+                                                                <th>Card</th>
+                                                                <th>Name</th>
+                                                                <th>Set</th>
+                                                                <th>Rarity</th>
+                                                                <th>Count</th>
+                                                                <th>Commander</th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                """);
 
         foreach (var (card, count) in await cards)
-        {
             await File.AppendAllTextAsync(outputOptions.OutputPath, $"""
 
                                                                      <tr>
@@ -47,7 +47,6 @@ public class ReportGenerator(PostgreSqlRepository repository,
                                                                      <th>{(configuredSetsOptions.ConfiguredCommanderSets.Contains(card.Set) ? "Yes" : "No")}</th>
                                                                      </tr>
                                                                      """);
-        }
 
         await File.AppendAllTextAsync(outputOptions.OutputPath, """
 
@@ -65,7 +64,7 @@ public class ReportGenerator(PostgreSqlRepository repository,
                                                                   if (index === 0) return;
                                                                   th.addEventListener('click', () => sortTable(index, th));
                                                                 });
-                                                                
+
                                                                 document.querySelectorAll('#cards thead th').forEach((th) => {
                                                                   const span = document.createElement('span');
                                                                   span.className = 'sort-indicator';
@@ -135,7 +134,7 @@ public class ReportGenerator(PostgreSqlRepository repository,
                                                                   // set indicator on active header
                                                                   const indicator = th.querySelector('.sort-indicator');
                                                                   if (indicator) indicator.textContent = (current === 'asc') ? '▲' : '▼';
-                                                                
+
                                                                   // re-apply any filters (if you have that)
                                                                   if (typeof applyCommanderFilter === 'function') applyCommanderFilter();
                                                                 }
@@ -147,19 +146,19 @@ public class ReportGenerator(PostgreSqlRepository repository,
                                                                   setTh.dataset.order = 'desc'; // set opposite so sortTable toggles to 'asc'
                                                                   sortTable(2, setTh);
                                                                 });
-                                                                
+
                                                                 // index of the "Commander" column (0-based). Change if needed.
                                                                 const commanderColIndex = 5;
-                                                                
+
                                                                 const toggleBtn = document.getElementById('toggle-commander-only');
                                                                 let hideCommanderOnly = false;
-                                                                
+
                                                                 toggleBtn.addEventListener('click', () => {
                                                                   hideCommanderOnly = !hideCommanderOnly;
                                                                   toggleBtn.textContent = hideCommanderOnly ? 'Show commander-only cards' : 'Hide commander-only cards';
                                                                   applyCommanderFilter();
                                                                 });
-                                                                
+
                                                                 function applyCommanderFilter() {
                                                                   const table = document.getElementById('cards');
                                                                   const tbody = table.tBodies[0];
