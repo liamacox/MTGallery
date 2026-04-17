@@ -5,6 +5,7 @@ MTGallery is a simple Magic: The Gathering pack generator and card repository. T
 This generator supports creating packs for the following sets:
 * Bloomburrow (blb)
 * Lorwyn Eclipsed (ecl)
+* Secrets of Strixhaven (sos)
 
 Commander sets can be configured as shown in the below configuration section.
 

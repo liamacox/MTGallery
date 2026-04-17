@@ -14,16 +14,24 @@ public class PackGenerationCoordinator(PostgreSqlRepository repository)
             specialGuestRateDenominator: 1000,
             specialGuestCollectorNumberLowerBound: 54,
             specialGuestCollectorNumberUpperBound: 63,
-            pullRates: PullRatesProvider.GetPullRates(setCode: "blb"),
-            repository: repository)},
+            pullRates: PullRatesProvider.GetPullRates("blb"),
+            repository)},
         {"ecl", new DefaultPackGenerator(
             setCode: "ecl", 
             specialGuestRateNumerator: 1,
             specialGuestRateDenominator: 55,
             specialGuestCollectorNumberLowerBound: 129,
             specialGuestCollectorNumberUpperBound: 148,
-            pullRates: PullRatesProvider.GetPullRates(setCode: "ecl"),
-            repository: repository)},
+            pullRates: PullRatesProvider.GetPullRates("ecl"),
+            repository)},
+        {"sos", new MysticalArchivePackGenerator(
+            setCode: "sos",
+            specialGuestRateNumerator: 1,
+            specialGuestRateDenominator: 55,
+            specialGuestCollectorNumberLowerBound: 149,
+            specialGuestCollectorNumberUpperBound: 158,
+            pullRates: PullRatesProvider.GetPullRates("sos"),
+            repository)},
     }.ToFrozenDictionary();
     
     public IReadOnlyCollection<string> PullableSets => _packGenerators.Keys;
