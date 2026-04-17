@@ -94,6 +94,11 @@ async Task GeneratePacksInteractiveAsync()
 
 async Task TruncateDataBaseInteractiveAsync()
 {
+    if (!databaseOptions.AllowTruncation)
+    {
+        Console.WriteLine("Database truncation is disabled! Please update your configuration.");
+        return;
+    }
     Console.WriteLine("Are you sure you want to reset the pulled cards table? This action cannot be undone!");
     Console.WriteLine("Enter Y to proceed and any other key to cancel:");
 
