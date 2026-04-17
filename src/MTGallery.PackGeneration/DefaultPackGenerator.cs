@@ -1,5 +1,4 @@
 ﻿using System.Collections.Frozen;
-using MTGallery.Configuration;
 using MTGallery.Domain;
 using MTGallery.Persistence;
 
@@ -10,6 +9,7 @@ internal class DefaultPackGenerator(string setCode,
     int specialGuestRateDenominator,
     int specialGuestCollectorNumberLowerBound,
     int specialGuestCollectorNumberUpperBound,
+    IReadOnlyList<PullRates> pullRates,
     PostgreSqlRepository repository) : IPackGenerator
 {
     private const int SpecialGuestPull = 7;
@@ -17,13 +17,11 @@ internal class DefaultPackGenerator(string setCode,
     
     public async Task<FrozenDictionary<Card, int>> GeneratePacksAsync(int numberOfPacks = 1)
     {
-        var pullRatesTask = repository.GetPullRatesForSetAsync(setCode);
         var setCardsTask = repository.GetCardsForSetAsync(setCode);
         var specialGuestCardsTask = GetSpecialGuestCardsAsync();
         
         Dictionary<Card, int> pulledCards = [];
         
-        var pullRates = await pullRatesTask;
         var allAvailableCards = (await setCardsTask).Concat(await specialGuestCardsTask).ToFrozenSet();
         
         foreach (var _ in Enumerable.Range(0, numberOfPacks))

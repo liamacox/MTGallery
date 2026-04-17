@@ -10,30 +10,32 @@ public class PackGenerationCoordinator(PostgreSqlRepository repository, Configur
     private readonly FrozenDictionary<string, IPackGenerator> _packGenerators = new Dictionary<string, IPackGenerator>()
     {
         {"blb", new DefaultPackGenerator(
-            "blb", 
-            15,
-            1000,
-            54,
-            63,
-            repository)},
+            setCode: "blb", 
+            specialGuestRateNumerator: 15,
+            specialGuestRateDenominator: 1000,
+            specialGuestCollectorNumberLowerBound: 54,
+            specialGuestCollectorNumberUpperBound: 63,
+            pullRates: PullRatesProvider.GetPullRates(setCode: "blb"),
+            repository: repository)},
         {"ecl", new DefaultPackGenerator(
-            "ecl", 
-            1,
-            55,
-            129,
-            148,
-            repository)},
+            setCode: "ecl", 
+            specialGuestRateNumerator: 1,
+            specialGuestRateDenominator: 55,
+            specialGuestCollectorNumberLowerBound: 129,
+            specialGuestCollectorNumberUpperBound: 148,
+            pullRates: PullRatesProvider.GetPullRates(setCode: "ecl"),
+            repository: repository)},
     }.ToFrozenDictionary();
     
     public IReadOnlyCollection<string> PullableSets => _packGenerators.Keys;
     
     public Task<FrozenDictionary<Card, int>> GeneratePacksAsync(string setCode, int numberOfPacks = 1)
     {
-        if (!_packGenerators.ContainsKey(setCode))
-            throw new ArgumentException($"{setCode} is not a configured set!");
+        if (!_packGenerators.ContainsKey(key: setCode))
+            throw new ArgumentException(message: $"{setCode} is not a configured set!");
         if (numberOfPacks < 1)
-            throw new ArgumentException("Invalid number of packs!");
+            throw new ArgumentException(message: "Invalid number of packs!");
 
-        return _packGenerators[setCode].GeneratePacksAsync(numberOfPacks);
+        return _packGenerators[key: setCode].GeneratePacksAsync(numberOfPacks: numberOfPacks);
     }
 }
