@@ -28,17 +28,19 @@ internal class DefaultPackGenerator(
         foreach (var _ in Enumerable.Range(0, numberOfPacks))
         {
             var cardNumber = 0;
+            HashSet<Card> pulledCardsThisPack = [];
             foreach (var rates in pullRates)
             {
                 ++cardNumber;
 
-                var availableCards = GetAvailableCards(cardNumber, rates, allAvailableCards, pulledCards);
+                var availableCards = GetAvailableCards(cardNumber, rates, allAvailableCards, pulledCardsThisPack);
 
                 Random.Shared.Shuffle(availableCards);
 
                 var card = availableCards.ElementAt(Random.Shared.Next(0, availableCards.Length));
                 pulledCards.TryGetValue(card, out var count);
                 pulledCards[card] = count + 1;
+                pulledCardsThisPack.Add(card);
             }
         }
 
@@ -49,7 +51,7 @@ internal class DefaultPackGenerator(
         int cardNumber, 
         PullRates rates, 
         FrozenSet<Card> allAvailableCards,
-        Dictionary<Card, int> pulledCards)
+        HashSet<Card> pulledCardsThisPack)
     {
         if (IsSpecialGuestCard(cardNumber))
             return allAvailableCards.Where(card => card.Set == SpecialGuestSetCode).ToArray();
@@ -59,7 +61,7 @@ internal class DefaultPackGenerator(
 
         return allAvailableCards.Where(card => card.Rarity == rarity 
                                                && card.Set == setCode
-                                               && !pulledCards.ContainsKey(card)).ToArray();
+                                               && !pulledCardsThisPack.Contains(card)).ToArray();
     }
 
     private bool IsSpecialGuestCard(int cardNumber)
