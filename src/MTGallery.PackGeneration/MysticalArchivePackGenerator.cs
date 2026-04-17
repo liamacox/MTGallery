@@ -54,7 +54,10 @@ public class MysticalArchivePackGenerator(
         return pulledCards.ToFrozenDictionary();
     }
 
-    private Card[] GetAvailableCards(int cardNumber, PullRates rates, FrozenSet<Card> allAvailableCards,
+    private Card[] GetAvailableCards(
+        int cardNumber,
+        PullRates rates,
+        FrozenSet<Card> allAvailableCards,
         HashSet<Card> pulledCardsThisPack)
     {
         if (IsSpecialGuestCard(cardNumber))
