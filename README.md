@@ -27,7 +27,8 @@ Commander sets can be configured as shown in the below configuration section.
         "Password": "<Database password>",
         "Host": "<Database IP / hostname>",
         "Port": "<Database port>",
-        "Database": "<Database name>"
+        "Database": "<Database name>",
+        "AllowTruncation": <true/false>
     },
     "ConfiguredSetsOptions": {
         "ConfiguredCommanderSets": [<"comma", "seperated", "list", "of", "commander", "setcodes">],   
@@ -43,6 +44,7 @@ Commander sets can be configured as shown in the below configuration section.
 * `Host` - IP or Hostname of the database server.
 * `Port` - Database server port.
 * `Database` - Name of the desired database. 
+* `AllowTruncation` - Set to `true` if you want to be able to truncate (reset) your pulled cards database. Set to `false` in all other circumstances.
 
 ## Configured Sets Options
 * `ConfiguredCommanderSets` - List of **commander** sets you want to be able to load into your card pool. The program does not "draw" from commander sets. It instead adds one of each card into your pool of pulled cards, as if you had purchased one of each commander precon for the set.
