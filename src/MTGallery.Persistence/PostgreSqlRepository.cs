@@ -100,12 +100,6 @@ public class PostgreSqlRepository(
     {
         await using var dataSource = NpgsqlDataSource.Create(_connectionString);
         await using var connection = await dataSource.OpenConnectionAsync();
-
-        await using var truncateCommand = connection.CreateCommand();
-        truncateCommand.CommandText = """
-                                      TRUNCATE TABLE set_data RESTART IDENTITY;
-                                      """;
-        await truncateCommand.ExecuteNonQueryAsync();
         
         var cards = await ScryfallApiClient.GetSetDataAsync(setCode);
             
