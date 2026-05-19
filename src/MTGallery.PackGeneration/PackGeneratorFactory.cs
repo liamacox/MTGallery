@@ -17,8 +17,9 @@ public class PackGeneratorFactory(PostgreSqlRepository repository)
 
     private IPackGenerator GetSetWithMysticalArchiveAndSpecialGuestPackGenerator(
         SetWithMysticalArchiveAndSpecialGuestConfiguration configuration)
-        => new SetWithSpgPackGenerator(
+        => new SetWithMysticalArchivePackGenerator(
             configuration.SetCode,
+            configuration.MysticalArchiveSetCode,
             configuration.SpecialGuestRateNumerator,
             configuration.SpecialGuestRateDenominator,
             configuration.SpecialGuestCollectorNumberLowerBound,
