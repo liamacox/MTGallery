@@ -4,7 +4,7 @@ using MTGallery.Persistence;
 
 namespace MTGallery.PackGeneration;
 
-internal class DefaultPackGenerator(
+internal class SetWithSpgPackGenerator(
     string setCode,
     int specialGuestRateNumerator,
     int specialGuestRateDenominator,

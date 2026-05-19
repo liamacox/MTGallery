@@ -8,7 +8,7 @@ public class PackGenerationCoordinator(PostgreSqlRepository repository)
 {
     private readonly FrozenDictionary<string, IPackGenerator> _packGenerators = new Dictionary<string, IPackGenerator>()
     {
-        {"blb", new DefaultPackGenerator(
+        {"blb", new SetWithSpgPackGenerator(
             setCode: "blb", 
             specialGuestRateNumerator: 15,
             specialGuestRateDenominator: 1000,
@@ -16,7 +16,7 @@ public class PackGenerationCoordinator(PostgreSqlRepository repository)
             specialGuestCollectorNumberUpperBound: 63,
             pullRates: PullRatesProvider.GetPullRates("blb"),
             repository)},
-        {"ecl", new DefaultPackGenerator(
+        {"ecl", new SetWithSpgPackGenerator(
             setCode: "ecl", 
             specialGuestRateNumerator: 1,
             specialGuestRateDenominator: 55,
