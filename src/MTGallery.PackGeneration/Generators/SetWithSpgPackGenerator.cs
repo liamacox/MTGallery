@@ -2,9 +2,9 @@
 using MTGallery.Domain;
 using MTGallery.Persistence;
 
-namespace MTGallery.PackGeneration;
+namespace MTGallery.PackGeneration.Generators;
 
-public class MysticalArchivePackGenerator(
+internal class SetWithSpgPackGenerator(
     string setCode,
     int specialGuestRateNumerator,
     int specialGuestRateDenominator,
@@ -13,24 +13,17 @@ public class MysticalArchivePackGenerator(
     IReadOnlyList<PullRates> pullRates,
     PostgreSqlRepository repository) : IPackGenerator
 {
-    private const int MysticalArchivePull = 13;
-    private const string MysticalArchiveSetCode = "soa";
-
     private const int SpecialGuestPull = 7;
     private const string SpecialGuestSetCode = "spg";
 
     public async Task<FrozenDictionary<Card, int>> GeneratePacksAsync(int numberOfPacks = 1)
     {
-        var mysticalArchiveCardsTask = repository.GetCardsForSetAsync(MysticalArchiveSetCode);
         var setCardsTask = repository.GetCardsForSetAsync(setCode);
         var specialGuestCardsTask = GetSpecialGuestCardsAsync();
 
         Dictionary<Card, int> pulledCards = [];
 
-        var allAvailableCards = (await setCardsTask)
-            .Concat(await specialGuestCardsTask)
-            .Concat(await mysticalArchiveCardsTask)
-            .ToFrozenSet();
+        var allAvailableCards = (await setCardsTask).Concat(await specialGuestCardsTask).ToFrozenSet();
 
         foreach (var _ in Enumerable.Range(0, numberOfPacks))
         {
@@ -45,7 +38,7 @@ public class MysticalArchivePackGenerator(
                 Random.Shared.Shuffle(availableCards);
 
                 var card = availableCards.ElementAt(Random.Shared.Next(0, availableCards.Length));
-                pulledCards.TryGetValue(card, out int count);
+                pulledCards.TryGetValue(card, out var count);
                 pulledCards[card] = count + 1;
                 pulledCardsThisPack.Add(card);
             }
@@ -55,8 +48,8 @@ public class MysticalArchivePackGenerator(
     }
 
     private Card[] GetAvailableCards(
-        int cardNumber,
-        PullRates rates,
+        int cardNumber, 
+        PullRates rates, 
         FrozenSet<Card> allAvailableCards,
         HashSet<Card> pulledCardsThisPack)
     {
@@ -65,10 +58,6 @@ public class MysticalArchivePackGenerator(
 
         var draws = GenerateRaritiesList(rates);
         var rarity = draws.ElementAt(Random.Shared.Next(0, draws.Count));
-
-        if (cardNumber == MysticalArchivePull)
-            return allAvailableCards.Where(card => card.Set == MysticalArchiveSetCode && card.Rarity == rarity)
-                .ToArray();
 
         return allAvailableCards.Where(card => card.Rarity == rarity 
                                                && card.Set == setCode

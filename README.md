@@ -2,10 +2,12 @@
 MTGallery is a simple Magic: The Gathering pack generator and card repository. The generator supports any set that can be found on [Scryfall](https://scryfall.com/) and generates a simple HTML report that can be easily shared with others.  
 
 ## Supported Sets
-This generator supports creating packs for the following sets:
+This generator currently supports creating packs for the following sets:
 * Bloomburrow (blb)
 * Lorwyn Eclipsed (ecl)
 * Secrets of Strixhaven (sos)
+
+However, this list can easily be extended with simple JSON files. Please see [set-data](set-data) for examples. 
 
 Commander sets can be configured as shown in the below configuration section.
 
@@ -31,7 +33,8 @@ Commander sets can be configured as shown in the below configuration section.
         "AllowTruncation": <true/false>
     },
     "ConfiguredSetsOptions": {
-        "ConfiguredCommanderSets": [<"comma", "seperated", "list", "of", "commander", "setcodes">],   
+        "ConfiguredCommanderSets": [<"comma", "seperated", "list", "of", "commander", "setcodes">],
+        "PullableSetsDirectory": "<Full path To directory of pullable sets configuration>"   
     }
 }
 ```
@@ -48,11 +51,13 @@ Commander sets can be configured as shown in the below configuration section.
 
 ## Configured Sets Options
 * `ConfiguredCommanderSets` - List of **commander** sets you want to be able to load into your card pool. The program does not "draw" from commander sets. It instead adds one of each card into your pool of pulled cards, as if you had purchased one of each commander precon for the set.
+* `PullableSetsDirectory` - The directory that contains the pullable set JSON configuration files. Please see [set-data](set-data) for examples. 
 
 ### Example `ConfiguredSetsOptions` Configuration
 ```json
 "ConfiguredSetsOptions": {
     "ConfiguredCommanderSets": ["ecc", "blc"],
+    "PullableSetsDirectory": "C:\\Users\\Liam Cox\\git\\MTGallery\\set-data"
 }
 ```
 
