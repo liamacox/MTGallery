@@ -26,7 +26,8 @@ var cache = new MemoryCache(new MemoryCacheOptions());
 var postgreSqlRepository = new PostgreSqlRepository(cache, databaseOptions);
 var initializeTask = postgreSqlRepository.InitializeAsync();
 var reportGenerator = new ReportGenerator(postgreSqlRepository, configuredSetsOptions, outputOptions);
-var packGenerator = new PackGenerationCoordinator(postgreSqlRepository);
+var packGeneratorFactory = new PackGeneratorFactory(postgreSqlRepository);
+var packGenerator = new PackGenerationCoordinator(packGeneratorFactory, configuredSetsOptions);
 await initializeTask;
 
 /* ---------------------------------------- User Interface ---------------------------------------- */
