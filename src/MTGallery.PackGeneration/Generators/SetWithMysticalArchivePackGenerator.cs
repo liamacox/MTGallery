@@ -4,8 +4,9 @@ using MTGallery.Persistence;
 
 namespace MTGallery.PackGeneration.Generators;
 
-public class SetWithMysticalArchivePackGenerator(
+internal class SetWithMysticalArchivePackGenerator(
     string setCode,
+    string mysticalArchiveSetCode,
     int specialGuestRateNumerator,
     int specialGuestRateDenominator,
     int specialGuestCollectorNumberLowerBound,
@@ -14,14 +15,13 @@ public class SetWithMysticalArchivePackGenerator(
     PostgreSqlRepository repository) : IPackGenerator
 {
     private const int MysticalArchivePull = 13;
-    private const string MysticalArchiveSetCode = "soa";
 
     private const int SpecialGuestPull = 7;
     private const string SpecialGuestSetCode = "spg";
 
     public async Task<FrozenDictionary<Card, int>> GeneratePacksAsync(int numberOfPacks = 1)
     {
-        var mysticalArchiveCardsTask = repository.GetCardsForSetAsync(MysticalArchiveSetCode);
+        var mysticalArchiveCardsTask = repository.GetCardsForSetAsync(mysticalArchiveSetCode);
         var setCardsTask = repository.GetCardsForSetAsync(setCode);
         var specialGuestCardsTask = GetSpecialGuestCardsAsync();
 
@@ -67,7 +67,7 @@ public class SetWithMysticalArchivePackGenerator(
         var rarity = draws.ElementAt(Random.Shared.Next(0, draws.Count));
 
         if (cardNumber == MysticalArchivePull)
-            return allAvailableCards.Where(card => card.Set == MysticalArchiveSetCode && card.Rarity == rarity)
+            return allAvailableCards.Where(card => card.Set == mysticalArchiveSetCode && card.Rarity == rarity)
                 .ToArray();
 
         return allAvailableCards.Where(card => card.Rarity == rarity 
