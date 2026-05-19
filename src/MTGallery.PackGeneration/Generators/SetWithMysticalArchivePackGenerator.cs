@@ -4,7 +4,7 @@ using MTGallery.Persistence;
 
 namespace MTGallery.PackGeneration.Generators;
 
-public class MysticalArchivePackGenerator(
+public class SetWithMysticalArchivePackGenerator(
     string setCode,
     int specialGuestRateNumerator,
     int specialGuestRateDenominator,

@@ -25,7 +25,7 @@ public class PackGenerationCoordinator(PostgreSqlRepository repository)
             specialGuestCollectorNumberUpperBound: 148,
             pullRates: PullRatesProvider.GetPullRates("ecl"),
             repository)},
-        {"sos", new MysticalArchivePackGenerator(
+        {"sos", new SetWithMysticalArchivePackGenerator(
             setCode: "sos",
             specialGuestRateNumerator: 1,
             specialGuestRateDenominator: 55,
