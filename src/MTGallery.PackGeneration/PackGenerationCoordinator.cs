@@ -1,5 +1,6 @@
 ﻿using System.Collections.Frozen;
 using MTGallery.Domain;
+using MTGallery.PackGeneration.Generators;
 using MTGallery.Persistence;
 
 namespace MTGallery.PackGeneration;

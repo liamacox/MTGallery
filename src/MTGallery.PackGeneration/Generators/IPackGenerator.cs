@@ -1,7 +1,7 @@
 ﻿using System.Collections.Frozen;
 using MTGallery.Domain;
 
-namespace MTGallery.PackGeneration;
+namespace MTGallery.PackGeneration.Generators;
 
 internal interface IPackGenerator
 {

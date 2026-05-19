@@ -2,7 +2,7 @@
 using MTGallery.Domain;
 using MTGallery.Persistence;
 
-namespace MTGallery.PackGeneration;
+namespace MTGallery.PackGeneration.Generators;
 
 internal class SetWithSpgPackGenerator(
     string setCode,
