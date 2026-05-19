@@ -5,7 +5,7 @@ namespace MTGallery.PackGeneration;
 
 internal class SetWithMysticalArchiveAndSpecialGuestConfiguration : PackGeneratorConfiguration
 {
-    public required string MysticalArchiveSet { get; init; }
+    public required string MysticalArchiveSetCode { get; init; }
 }
 
 internal class SetWithSpgPackGeneratorConfiguration : PackGeneratorConfiguration;

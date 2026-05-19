@@ -1,6 +1,7 @@
 {
     "SetType": "SpecialGuestAndMysticalArchive",
     "SetCode": "sos",
+    "MysticalArchiveSetCode": "soa",
     "SpecialGuestRateNumerator": 1,
     "SpecialGuestRateDenominator": 55,
     "SpecialGuestCollectorNumberLowerBound": 149,
