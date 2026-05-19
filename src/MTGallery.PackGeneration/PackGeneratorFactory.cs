@@ -5,7 +5,7 @@ namespace MTGallery.PackGeneration;
 
 public class PackGeneratorFactory(PostgreSqlRepository repository)
 {
-    IPackGenerator GetPackGenerator(PackGeneratorConfiguration configuration)
+    internal IPackGenerator GetPackGenerator(PackGeneratorConfiguration configuration)
         => configuration switch
         {
             SetWithSpgPackGeneratorConfiguration generatorConfiguration => 
